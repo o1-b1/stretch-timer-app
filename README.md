@@ -49,3 +49,11 @@ Your site URL will be:
 
 - The service worker intentionally does **not** cache app HTML navigations (including `index.html`) to avoid stale/blank-page issues.
 - It only caches safe static assets with a versioned cache key.
+
+## Icon placeholders
+
+This repo references icon filenames only and does not commit binary icon assets. Upload these files when ready:
+
+- `apple-touch-icon.png`
+- `icon-192.png`
+- `icon-512.png`
