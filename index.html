@@ -3,25 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0d111a" />
+  <meta name="theme-color" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Stretch Timer" />
   <title>Stretch Timer</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <style>
     :root {
-      --bg: radial-gradient(circle at top, #1a2338 0%, #0d111a 52%, #07090f 100%);
-      --card: rgba(255, 255, 255, 0.08);
-      --card-border: rgba(255, 255, 255, 0.14);
-      --text: #f4f7ff;
-      --muted: #b9c0d4;
-      --accent: #7aa2ff;
-      --accent-2: #5de4c7;
-      --danger: #ff6d85;
-      --shadow: 0 18px 40px rgba(0, 0, 0, 0.36);
-      --radius: 22px;
+      --bg: #020617;
+      --panel: #0f172a;
+      --panel-2: #111827;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-strong: #0ea5e9;
+      --danger: #f87171;
+      --ok: #34d399;
+      --radius: 14px;
     }
 
     * { box-sizing: border-box; }
@@ -30,71 +29,99 @@
       margin: 0;
       min-height: 100vh;
       min-height: 100dvh;
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #020617 0%, #0b1120 55%, #111827 100%);
       color: var(--text);
-      font-family: "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: calc(16px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
-      letter-spacing: 0.01em;
+      padding: calc(14px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
     }
 
     .app {
-      width: min(740px, 100%);
+      width: min(760px, 100%);
+      margin: 0 auto;
       display: grid;
-      gap: 14px;
+      gap: 12px;
       align-content: start;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.25);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      padding: 18px;
+      padding: 14px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(1.35rem, 4vw, 1.9rem);
-      font-weight: 700;
+      font-size: clamp(1.2rem, 4.8vw, 1.8rem);
+      line-height: 1.2;
     }
 
-    .status {
-      color: var(--muted);
-      margin-top: 6px;
-      font-size: 0.95rem;
+    .row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
+
+    .muted { color: var(--muted); }
+
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--text);
+      background: var(--panel-2);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active { transform: scale(0.985); }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #082f49;
+      border-color: rgba(56, 189, 248, 0.85);
+    }
+
+    button.ghost.active {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.45);
+    }
+
+    button.reset { color: #fecaca; border-color: rgba(248, 113, 113, 0.5); }
 
     .timer {
-      font-size: clamp(2.1rem, 11vw, 3.9rem);
-      font-weight: 700;
-      margin: 10px 0 4px;
+      margin-top: 10px;
+      font-size: clamp(2.4rem, 16vw, 5rem);
       font-variant-numeric: tabular-nums;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.02em;
     }
 
-    .step {
-      font-size: clamp(1rem, 3.8vw, 1.32rem);
-      color: #eef3ff;
-      line-height: 1.25;
-      min-height: 2.45em;
-    }
-
-    .totals {
+    .current-step {
       margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.92rem;
+      font-size: clamp(1rem, 4.2vw, 1.3rem);
+      line-height: 1.25;
+      min-height: 2.5em;
     }
 
     .progress {
-      margin-top: 12px;
-      width: 100%;
+      margin-top: 10px;
       height: 10px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(148, 163, 184, 0.28);
       overflow: hidden;
     }
 
@@ -102,338 +129,385 @@
       display: block;
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
       border-radius: inherit;
-      transition: width 0.25s ease;
+      background: linear-gradient(90deg, var(--ok), var(--accent));
+      transition: width 0.2s ease;
     }
 
     .controls {
+      margin-top: 12px;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    button {
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 11px 10px;
-      font-size: 0.97rem;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      transition: transform 0.12s ease, background-color 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button.primary {
-      background: linear-gradient(120deg, #7aa2ff, #76d8ff);
-      color: #061127;
-      border-color: rgba(255, 255, 255, 0.45);
-    }
-
-    button.reset {
-      color: #ffd1d9;
-    }
-
-    .settings {
-      margin-top: 13px;
-      display: flex;
-      align-items: center;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      color: var(--muted);
-      font-size: 0.93rem;
     }
 
-    .settings input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent-2);
-    }
-
-    .list-title {
-      font-size: 0.93rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    ul {
-      margin: 0;
+    .list {
+      margin: 8px 0 0;
       padding: 0;
       list-style: none;
       display: grid;
+      gap: 7px;
+    }
+
+    .list li button {
+      width: 100%;
+      text-align: left;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
     }
 
-    li button {
-      width: 100%;
-      text-align: left;
-      border-radius: 14px;
-      padding: 11px 12px;
+    .list li.active button {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.45);
+      background: #0c2436;
+    }
+
+    .foot {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    li.active button {
-      border-color: rgba(125, 180, 255, 0.9);
-      box-shadow: inset 0 0 0 1px rgba(120, 176, 255, 0.65);
-      background: rgba(122, 162, 255, 0.2);
-    }
-
-    .small {
-      display: inline-block;
       color: var(--muted);
-      margin-left: 8px;
-      font-size: 0.86rem;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    @media (max-width: 560px) {
+      .controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .controls button:nth-child(1),
+      .controls button:nth-child(2) { grid-column: span 1; }
+      .controls button:nth-child(3) { grid-column: span 1; }
+      .controls button:nth-child(4),
+      .controls button:nth-child(5) { grid-column: span 1; }
     }
   </style>
 </head>
 <body>
   <main class="app">
     <section class="card">
-      <h1>Undo Sitting + Recover</h1>
-      <div class="status" id="statusLine">Status: Ready</div>
-      <div class="timer" id="timerDisplay">01:00</div>
-      <div class="step" id="stepDisplay"></div>
-      <div class="totals" id="totalsDisplay">Remaining total: --:--</div>
+      <h1>Stretch Timer</h1>
+      <div class="row">
+        <div id="status" class="muted">Ready</div>
+        <div class="mode-switch" role="group" aria-label="Mode switch">
+          <button id="fullModeBtn" type="button" class="ghost active">Full routine</button>
+          <button id="quickModeBtn" type="button" class="ghost">Quick mode</button>
+        </div>
+      </div>
+
+      <div id="timer" class="timer">00:45</div>
+      <div id="currentStep" class="current-step">Press Start to begin.</div>
+      <div id="totals" class="muted">Remaining total: --:--</div>
 
       <div class="progress" aria-label="Step progress">
         <span id="progressFill"></span>
       </div>
 
       <div class="controls">
-        <button id="prevBtn" type="button">Prev</button>
+        <button id="backBtn" type="button">Back</button>
         <button id="startPauseBtn" type="button" class="primary">Start</button>
         <button id="nextBtn" type="button">Next</button>
         <button id="resetBtn" type="button" class="reset">Reset</button>
+        <button id="restartStepBtn" type="button">Restart step</button>
       </div>
 
-      <label class="settings" for="vibrateToggle">
-        <input id="vibrateToggle" type="checkbox" checked />
-        Vibrate on step change
-      </label>
+      <div class="foot">
+        <label for="autoAdvanceToggle">
+          <input id="autoAdvanceToggle" type="checkbox" checked />
+          Auto-advance at end of each step
+        </label>
+        <label for="vibrateToggle">
+          <input id="vibrateToggle" type="checkbox" checked />
+          Vibrate on step change
+        </label>
+      </div>
     </section>
 
     <section class="card">
-      <div class="list-title">Stretch steps (tap to jump)</div>
-      <ul id="stepList"></ul>
+      <div class="muted">Routine steps (tap to jump)</div>
+      <ul id="stepList" class="list"></ul>
     </section>
   </main>
 
   <script>
-    const steps = [
-      { label: 'Half-Kneeling Hip Flexor — Left', seconds: 60 },
-      { label: 'Half-Kneeling Hip Flexor — Right', seconds: 60 },
-      { label: 'Pigeon Pose — Left', seconds: 60 },
-      { label: 'Pigeon Pose — Right', seconds: 60 },
-      { label: 'Couch Stretch — Left', seconds: 75 },
-      { label: 'Couch Stretch — Right', seconds: 75 },
-      { label: 'Hamstring Stretch — Left', seconds: 60 },
-      { label: 'Hamstring Stretch — Right', seconds: 60 },
-      { label: 'Open Book — Left', seconds: 45 },
-      { label: 'Open Book — Right', seconds: 45 },
-      { label: "Child's Pose + Lat — Center", seconds: 30 },
-      { label: "Child's Pose + Lat — Left", seconds: 30 },
-      { label: "Child's Pose + Lat — Right", seconds: 30 },
-      { label: 'Doorway Chest Stretch — Both', seconds: 60 },
-      { label: 'Deep Squat Hold — Hold', seconds: 60 }
-    ];
+    const STORAGE_KEY = 'stretch-timer-settings-v1';
 
-    const statusLine = document.getElementById('statusLine');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const stepDisplay = document.getElementById('stepDisplay');
-    const totalsDisplay = document.getElementById('totalsDisplay');
-    const progressFill = document.getElementById('progressFill');
+    const ROUTINES = {
+      full: [
+        { label: 'Half-Kneeling Hip Flexor — Left', seconds: 60 },
+        { label: 'Half-Kneeling Hip Flexor — Right', seconds: 60 },
+        { label: 'Couch Stretch — Left', seconds: 60 },
+        { label: 'Couch Stretch — Right', seconds: 60 },
+        { label: 'Hamstring Stretch — Left', seconds: 45 },
+        { label: 'Hamstring Stretch — Right', seconds: 45 },
+        { label: 'Figure-4 Glute Stretch — Left', seconds: 45 },
+        { label: 'Figure-4 Glute Stretch — Right', seconds: 45 },
+        { label: 'Thoracic Open Book — Left', seconds: 40 },
+        { label: 'Thoracic Open Book — Right', seconds: 40 }
+      ],
+      quick: [
+        { label: 'Hip Flexor Stretch — Left', seconds: 45 },
+        { label: 'Hip Flexor Stretch — Right', seconds: 45 },
+        { label: 'Hamstring Stretch — Left', seconds: 35 },
+        { label: 'Hamstring Stretch — Right', seconds: 35 },
+        { label: 'Thoracic Open Book — Left', seconds: 30 },
+        { label: 'Thoracic Open Book — Right', seconds: 30 }
+      ]
+    };
 
-    const prevBtn = document.getElementById('prevBtn');
-    const startPauseBtn = document.getElementById('startPauseBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const vibrateToggle = document.getElementById('vibrateToggle');
-    const stepList = document.getElementById('stepList');
+    const els = {
+      timer: document.getElementById('timer'),
+      currentStep: document.getElementById('currentStep'),
+      totals: document.getElementById('totals'),
+      status: document.getElementById('status'),
+      progressFill: document.getElementById('progressFill'),
+      stepList: document.getElementById('stepList'),
+      startPauseBtn: document.getElementById('startPauseBtn'),
+      nextBtn: document.getElementById('nextBtn'),
+      backBtn: document.getElementById('backBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      restartStepBtn: document.getElementById('restartStepBtn'),
+      autoAdvanceToggle: document.getElementById('autoAdvanceToggle'),
+      vibrateToggle: document.getElementById('vibrateToggle'),
+      fullModeBtn: document.getElementById('fullModeBtn'),
+      quickModeBtn: document.getElementById('quickModeBtn')
+    };
 
-    let index = 0;
-    let remaining = steps[0].seconds;
-    let isRunning = false;
-    let ticker = null;
+    const state = {
+      mode: 'full',
+      stepIndex: 0,
+      remaining: 0,
+      isRunning: false,
+      autoAdvance: true,
+      vibrate: true,
+      ticker: null,
+      endsAt: 0
+    };
 
-    function formatTime(seconds) {
-      const safe = Math.max(0, Math.floor(seconds));
-      const m = Math.floor(safe / 60).toString().padStart(2, '0');
-      const s = (safe % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
+    function formatClock(totalSeconds) {
+      const s = Math.max(0, Math.floor(totalSeconds));
+      const min = Math.floor(s / 60).toString().padStart(2, '0');
+      const sec = (s % 60).toString().padStart(2, '0');
+      return `${min}:${sec}`;
     }
 
-    function remainingTotalSeconds() {
-      return steps.reduce((sum, step, i) => {
-        if (i < index) return sum;
-        if (i === index) return sum + remaining;
-        return sum + step.seconds;
-      }, 0);
+    function currentRoutine() {
+      return ROUTINES[state.mode];
     }
 
-    function buzz() {
-      if (!vibrateToggle.checked || !('vibrate' in navigator)) return;
-      navigator.vibrate([60, 40, 80]);
+    function currentStep() {
+      return currentRoutine()[state.stepIndex];
     }
 
-    function buildStepList() {
-      stepList.innerHTML = '';
-      steps.forEach((step, i) => {
-        const li = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = `${i + 1}. ${step.label}`;
-        const span = document.createElement('span');
-        span.className = 'small';
-        span.textContent = formatTime(step.seconds);
-        button.appendChild(span);
-        button.addEventListener('click', () => jumpTo(i));
-        li.appendChild(button);
-        stepList.appendChild(li);
-      });
-    }
-
-    function updateButtons() {
-      startPauseBtn.textContent = isRunning ? 'Pause' : (index === steps.length ? 'Restart' : 'Start');
-      startPauseBtn.disabled = index === steps.length && isRunning;
-    }
-
-    function updateUi() {
-      const done = index >= steps.length;
-      if (done) {
-        timerDisplay.textContent = '00:00';
-        stepDisplay.textContent = 'Routine complete';
-        totalsDisplay.textContent = 'Remaining total: 00:00';
-        statusLine.textContent = 'Status: Done';
-        progressFill.style.width = '100%';
-      } else {
-        const step = steps[index];
-        timerDisplay.textContent = formatTime(remaining);
-        stepDisplay.textContent = step.label;
-        totalsDisplay.textContent = `Remaining total: ${formatTime(remainingTotalSeconds())}`;
-        statusLine.textContent = `Status: ${isRunning ? 'Running' : 'Paused/Ready'}`;
-        const progress = ((step.seconds - remaining) / step.seconds) * 100;
-        progressFill.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed.mode === 'full' || parsed.mode === 'quick') state.mode = parsed.mode;
+        if (typeof parsed.autoAdvance === 'boolean') state.autoAdvance = parsed.autoAdvance;
+        if (typeof parsed.vibrate === 'boolean') state.vibrate = parsed.vibrate;
+      } catch (_) {
+        // Ignore invalid settings and continue with defaults.
       }
+    }
 
-      [...stepList.children].forEach((li, i) => {
-        li.classList.toggle('active', i === index && index < steps.length);
-      });
-
-      updateButtons();
+    function saveSettings() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        mode: state.mode,
+        autoAdvance: state.autoAdvance,
+        vibrate: state.vibrate
+      }));
     }
 
     function stopTicker() {
-      if (ticker) {
-        clearInterval(ticker);
-        ticker = null;
+      if (state.ticker) {
+        clearInterval(state.ticker);
+        state.ticker = null;
       }
+      state.isRunning = false;
+      els.startPauseBtn.textContent = 'Start';
     }
 
-    function nextStep(fromTimer = false) {
-      if (index < steps.length - 1) {
-        index += 1;
-        remaining = steps[index].seconds;
-        buzz();
-      } else {
-        index = steps.length;
-        remaining = 0;
-        stopTicker();
-        isRunning = false;
-        if (fromTimer) buzz();
-      }
-      updateUi();
-    }
+    function buildStepList() {
+      const routine = currentRoutine();
+      els.stepList.innerHTML = '';
+      routine.forEach((step, index) => {
+        const li = document.createElement('li');
+        if (index === state.stepIndex) li.className = 'active';
 
-    function prevStep() {
-      if (index <= 0) {
-        remaining = steps[0].seconds;
-      } else if (index >= steps.length) {
-        index = steps.length - 1;
-        remaining = steps[index].seconds;
-      } else {
-        index -= 1;
-        remaining = steps[index].seconds;
-      }
-      isRunning = false;
-      stopTicker();
-      updateUi();
-    }
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerHTML = `<span>${index + 1}. ${step.label}</span><span class="muted">${formatClock(step.seconds)}</span>`;
+        btn.addEventListener('click', () => {
+          state.stepIndex = index;
+          state.remaining = currentStep().seconds;
+          render();
+          if (state.isRunning) {
+            startTicker();
+          }
+        });
 
-    function jumpTo(i) {
-      if (i < 0 || i >= steps.length) return;
-      index = i;
-      remaining = steps[i].seconds;
-      isRunning = false;
-      stopTicker();
-      updateUi();
-    }
-
-    function resetRoutine() {
-      index = 0;
-      remaining = steps[0].seconds;
-      isRunning = false;
-      stopTicker();
-      updateUi();
-    }
-
-    function tick() {
-      if (!isRunning || index >= steps.length) return;
-      remaining -= 1;
-      if (remaining <= 0) {
-        nextStep(true);
-      } else {
-        updateUi();
-      }
-    }
-
-    function startPause() {
-      if (index >= steps.length) {
-        resetRoutine();
-      }
-
-      isRunning = !isRunning;
-      if (isRunning) {
-        tick();
-        ticker = setInterval(tick, 1000);
-      } else {
-        stopTicker();
-      }
-      updateUi();
-    }
-
-    prevBtn.addEventListener('click', prevStep);
-    nextBtn.addEventListener('click', () => {
-      isRunning = false;
-      stopTicker();
-      nextStep(false);
-    });
-    resetBtn.addEventListener('click', resetRoutine);
-    startPauseBtn.addEventListener('click', startPause);
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && isRunning) {
-        stopTicker();
-      } else if (!document.hidden && isRunning && !ticker) {
-        ticker = setInterval(tick, 1000);
-      }
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        li.appendChild(btn);
+        els.stepList.appendChild(li);
       });
     }
 
-    buildStepList();
-    updateUi();
+    function buzz() {
+      if (!state.vibrate) return;
+      if (navigator.vibrate) navigator.vibrate(120);
+    }
+
+    function remainingTotalSeconds() {
+      const routine = currentRoutine();
+      return routine.slice(state.stepIndex + 1).reduce((sum, step) => sum + step.seconds, 0) + state.remaining;
+    }
+
+    function render() {
+      const routine = currentRoutine();
+      const step = currentStep();
+      const stepElapsed = step.seconds - state.remaining;
+      const stepPct = step.seconds ? Math.min(100, (stepElapsed / step.seconds) * 100) : 0;
+
+      els.timer.textContent = formatClock(state.remaining);
+      els.currentStep.textContent = `${state.stepIndex + 1}/${routine.length}: ${step.label}`;
+      els.totals.textContent = `Remaining total: ${formatClock(remainingTotalSeconds())}`;
+      els.progressFill.style.width = `${stepPct}%`;
+      els.status.textContent = state.isRunning ? 'Running' : 'Paused';
+
+      els.startPauseBtn.textContent = state.isRunning ? 'Pause' : 'Start';
+      els.autoAdvanceToggle.checked = state.autoAdvance;
+      els.vibrateToggle.checked = state.vibrate;
+      els.fullModeBtn.classList.toggle('active', state.mode === 'full');
+      els.quickModeBtn.classList.toggle('active', state.mode === 'quick');
+      buildStepList();
+    }
+
+    function onStepFinished() {
+      buzz();
+      if (state.autoAdvance) {
+        nextStep(true);
+      } else {
+        stopTicker();
+        state.remaining = currentStep().seconds;
+        render();
+      }
+    }
+
+    function startTicker() {
+      const now = Date.now();
+      state.endsAt = now + state.remaining * 1000;
+      stopTicker();
+      state.isRunning = true;
+      els.startPauseBtn.textContent = 'Pause';
+
+      state.ticker = setInterval(() => {
+        const secondsLeft = Math.max(0, Math.ceil((state.endsAt - Date.now()) / 1000));
+        state.remaining = secondsLeft;
+        render();
+
+        if (secondsLeft <= 0) {
+          onStepFinished();
+        }
+      }, 200);
+    }
+
+    function switchMode(mode) {
+      if (state.mode === mode) return;
+      state.mode = mode;
+      state.stepIndex = 0;
+      state.remaining = currentStep().seconds;
+      stopTicker();
+      saveSettings();
+      render();
+    }
+
+    function nextStep(fromAuto = false) {
+      const routine = currentRoutine();
+      if (state.stepIndex < routine.length - 1) {
+        state.stepIndex += 1;
+        state.remaining = currentStep().seconds;
+        if (!fromAuto) buzz();
+        render();
+        if (state.isRunning || fromAuto) startTicker();
+      } else {
+        stopTicker();
+        state.remaining = currentStep().seconds;
+        els.status.textContent = 'Routine complete';
+        render();
+      }
+    }
+
+    function previousStep() {
+      if (state.stepIndex > 0) {
+        state.stepIndex -= 1;
+        state.remaining = currentStep().seconds;
+        buzz();
+        render();
+        if (state.isRunning) startTicker();
+      }
+    }
+
+    function resetRoutine() {
+      stopTicker();
+      state.stepIndex = 0;
+      state.remaining = currentStep().seconds;
+      els.status.textContent = 'Ready';
+      render();
+    }
+
+    els.startPauseBtn.addEventListener('click', () => {
+      if (state.isRunning) {
+        stopTicker();
+        render();
+      } else {
+        startTicker();
+      }
+    });
+
+    els.nextBtn.addEventListener('click', () => nextStep(false));
+    els.backBtn.addEventListener('click', previousStep);
+    els.resetBtn.addEventListener('click', resetRoutine);
+    els.restartStepBtn.addEventListener('click', () => {
+      state.remaining = currentStep().seconds;
+      render();
+      if (state.isRunning) startTicker();
+    });
+
+    els.autoAdvanceToggle.addEventListener('change', () => {
+      state.autoAdvance = els.autoAdvanceToggle.checked;
+      saveSettings();
+    });
+
+    els.vibrateToggle.addEventListener('change', () => {
+      state.vibrate = els.vibrateToggle.checked;
+      saveSettings();
+    });
+
+    els.fullModeBtn.addEventListener('click', () => switchMode('full'));
+    els.quickModeBtn.addEventListener('click', () => switchMode('quick'));
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    loadSettings();
+    state.remaining = currentStep().seconds;
+    render();
   </script>
 </body>
 </html>
