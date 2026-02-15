@@ -1,59 +1,46 @@
-# Stretch Timer (Static + GitHub Pages + PWA)
+# Stretch Timer PWA (GitHub Pages Static Site)
 
-A single-page stretch timer built with vanilla HTML/CSS/JS for your “undo sitting + recover” routine.
+A clean, static Stretch Timer app built with only:
 
-## Run locally on Mac
+- `index.html`
+- `manifest.json`
+- `sw.js`
+- `404.html`
 
-1. Open Terminal and go to this repo folder.
-2. Start a local server:
+## Features
+
+- Big, easy-to-read timer.
+- Controls: **Start/Pause**, **Next**, **Back**, **Reset**.
+- Auto-advance toggle.
+- **Full routine** and **Quick mode**.
+- Settings persisted in `localStorage`.
+- iOS-friendly top-aligned layout (no vertical centering).
+- Service worker strategy that avoids caching `index.html` and uses network-first navigation handling.
+
+## Local run
 
 ```bash
 python3 -m http.server 8000
 ```
 
-3. Open in Safari or Chrome:
+Open: `http://localhost:8000/`
 
-- http://localhost:8000/
+## Deploy to GitHub Pages
 
-## Verify core behavior
-
-- Start button, timer, and controls are visible immediately (top aligned).
-- Start/Pause, Prev/Next, Reset all work.
-- Timer auto-advances at 0.
-- Remaining total time updates.
-- Tapping a step jumps to that step.
-- Vibration toggle works where supported and fails gracefully where unsupported.
-
-## Deploy to GitHub Pages (main branch, root)
-
-1. Push this repo to GitHub.
-2. In GitHub, open **Settings → Pages**.
-3. Under **Build and deployment**, set:
+1. Push to GitHub.
+2. Go to **Settings → Pages**.
+3. Set:
    - **Source**: Deploy from a branch
-   - **Branch**: `main`
+   - **Branch**: `main` (or your deployment branch)
    - **Folder**: `/ (root)`
-4. Save and wait for deployment.
+4. Save.
 
-Your site URL will be:
+Site URL will be:
 
-- `https://<your-github-username>.github.io/<repo-name>/`
+`https://<username>.github.io/<repo-name>/`
 
-## iPhone Safari + Add to Home Screen
+## PWA notes
 
-1. Open the GitHub Pages URL in iPhone Safari.
-2. Tap the Share button.
-3. Tap **Add to Home Screen**.
-4. Launch from Home Screen to run as a standalone app.
-
-## Notes on reliability
-
-- The service worker intentionally does **not** cache app HTML navigations (including `index.html`) to avoid stale/blank-page issues.
-- It only caches safe static assets with a versioned cache key.
-
-## Icon placeholders
-
-This repo references icon filenames only and does not commit binary icon assets. Upload these files when ready:
-
-- `apple-touch-icon.png`
-- `icon-192.png`
-- `icon-512.png`
+- `manifest.json` intentionally has **no `icons` section** right now.
+- `index.html` intentionally does **not** reference `apple-touch-icon`.
+- Navigations are fetched from network first in `sw.js`; HTML shell is not cached as a static asset.
