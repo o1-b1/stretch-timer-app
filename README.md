@@ -1,46 +1,74 @@
-# Stretch Timer PWA (GitHub Pages Static Site)
+# Stretch Timer PWA v3
 
-A clean, static Stretch Timer app built with only:
+A polished, installable Stretch Timer for daily mobility sessions. The app is a static GitHub Pages site (HTML/CSS/JS + service worker + manifest) with:
 
-- `index.html`
-- `manifest.json`
-- `sw.js`
-- `404.html`
+- Sticky app-like header with current stretch and total remaining time.
+- Thumb-friendly controls (Back / Start-Pause / Next / Restart).
+- Clearly visible **Quick Stretch Mode** toggle.
+- Routine customization (move steps up/down + edit durations in seconds).
+- Persistent preferences in `localStorage`.
+- Progress indicator with **Step X of Y** + percentage bar.
+- Completion screen with total time stretched.
+- Optional dark theme toggle that also respects `prefers-color-scheme`.
+- Haptics on step completion (when supported) and optional WebAudio beep.
+- Offline fallback page via service worker.
 
-## Features
+## Project files
 
-- Big, easy-to-read timer.
-- Controls: **Start/Pause**, **Next**, **Back**, **Reset**.
-- Auto-advance toggle.
-- **Full routine** and **Quick mode**.
-- Settings persisted in `localStorage`.
-- iOS-friendly top-aligned layout (no vertical centering).
-- Service worker strategy that avoids caching `index.html` and uses network-first navigation handling.
+- `index.html` – app UI and logic.
+- `sw.js` – cache handling and offline navigation fallback.
+- `offline.html` – shown when navigation fails offline.
+- `manifest.json` – PWA metadata for installability.
+- `404.html` – GitHub Pages redirect helper.
 
-## Local run
+## Local testing
+
+Run a local static server from the repo root:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Open: `http://localhost:8000/`
+Open:
 
-## Deploy to GitHub Pages
+- Main app: `http://localhost:8000/`
+- (Optional) PWA checks in Chromium DevTools → Application (Manifest + Service Workers)
 
-1. Push to GitHub.
-2. Go to **Settings → Pages**.
-3. Set:
+## GitHub Pages deployment
+
+1. Push this repo to GitHub.
+2. Open **Settings → Pages**.
+3. Configure:
    - **Source**: Deploy from a branch
    - **Branch**: `main` (or your deployment branch)
    - **Folder**: `/ (root)`
 4. Save.
 
-Site URL will be:
+Your site URL will be:
 
-`https://<username>.github.io/<repo-name>/`
+`https://<username>.github.io/stretch-timer-app/`
 
-## PWA notes
+> Replace `<username>` with your GitHub username.
 
-- `manifest.json` intentionally has **no `icons` section** right now.
-- `index.html` intentionally does **not** reference `apple-touch-icon`.
-- Navigations are fetched from network first in `sw.js`; HTML shell is not cached as a static asset.
+## Add to Home Screen
+
+### iPhone / iPad (Safari)
+
+1. Open the app URL in Safari.
+2. Tap **Share**.
+3. Tap **Add to Home Screen**.
+4. Confirm the name and tap **Add**.
+
+### Android (Chrome)
+
+1. Open the app URL in Chrome.
+2. Tap the browser menu (`⋮`).
+3. Tap **Install app** or **Add to Home screen**.
+4. Confirm installation.
+
+## PWA behavior notes
+
+- `index.html` is **not precached**.
+- Navigations use a **network-first** strategy.
+- When offline and navigation fails, the app serves `offline.html`.
+- Manifest intentionally has no icons yet (add later when ready).
