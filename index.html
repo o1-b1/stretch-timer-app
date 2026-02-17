@@ -247,22 +247,49 @@
     .settings-grid {
       display: grid;
       gap: var(--space-2);
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
     label.setting {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+      display: grid;
+      gap: 8px;
       color: var(--text-muted);
       font-weight: 600;
       padding: 8px 0;
     }
 
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      accent-color: var(--accent);
+    select.setting-select {
+      min-height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-secondary);
+      color: var(--text);
+      padding: 8px 10px;
+      font: inherit;
+    }
+
+    .step-with-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stretch-icon {
+      width: 1.1em;
+      height: 1.1em;
+      display: inline-block;
+      color: var(--accent-strong);
+      flex: 0 0 auto;
+    }
+
+    .stretch-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .list {
@@ -289,17 +316,6 @@
 
     .step-name { font-weight: 650; }
 
-    .item-actions {
-      display: grid;
-      grid-template-columns: 74px repeat(3, auto);
-      gap: 6px;
-      align-items: center;
-      justify-content: start;
-    }
-
-    .item-actions input { min-height: 38px; text-align: center; padding: 6px; }
-    .item-actions button { min-height: 38px; padding: 6px 10px; font-size: 0.82rem; }
-
     .completion {
       display: none;
       margin-top: var(--space-2);
@@ -322,7 +338,6 @@
       .card { padding: var(--space-3); }
       .hero { min-height: min(72dvh, 560px); }
       .controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .item-actions { grid-template-columns: 70px repeat(3, auto); }
     }
   </style>
 </head>
@@ -360,7 +375,7 @@
       <article class="card step-card stack">
         <div class="caption">Current stretch</div>
         <p id="stepTitle" class="current-step">Press Start to begin.</p>
-        <p id="modeCaption" class="caption">Mode: Full routine</p>
+        <p id="modeCaption" class="caption">Mode: Long routine</p>
       </article>
 
       <article class="card controls-card stack">
@@ -389,26 +404,26 @@
         </div>
 
         <section id="routinePanel" class="collapsible" aria-hidden="true">
-          <p class="caption" style="margin:0 0 8px;">Reorder steps, adjust durations, and jump to any step.</p>
+          <p class="caption" style="margin:0 0 8px;">View steps and jump to any step.</p>
           <ul id="stepList" class="list"></ul>
         </section>
 
         <section id="settingsPanel" class="collapsible" aria-hidden="true">
           <div class="settings-grid">
             <label class="setting" for="quickModeToggle">
-              <input id="quickModeToggle" type="checkbox" /> Quick Stretch Mode
+              Routine
+              <select id="quickModeToggle" class="setting-select">
+                <option value="quick">Quick</option>
+                <option value="long">Long</option>
+              </select>
             </label>
-            <label class="setting" for="autoAdvanceToggle">
-              <input id="autoAdvanceToggle" type="checkbox" checked /> Auto-advance steps
-            </label>
-            <label class="setting" for="vibrateToggle">
-              <input id="vibrateToggle" type="checkbox" checked /> Haptics on step complete
-            </label>
-            <label class="setting" for="soundToggle">
-              <input id="soundToggle" type="checkbox" /> Sound on step change
-            </label>
-            <label class="setting" for="themeToggle">
-              <input id="themeToggle" type="checkbox" /> Force dark theme
+            <label class="setting" for="themeSelect">
+              Theme
+              <select id="themeSelect" class="setting-select">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
             </label>
           </div>
         </section>
@@ -426,25 +441,32 @@
     const STORAGE_KEY = 'stretch-timer-settings-v3';
 
     const DEFAULT_ROUTINES = {
-      full: [
-        { label: 'Half-Kneeling Hip Flexor — Left', seconds: 60 },
-        { label: 'Half-Kneeling Hip Flexor — Right', seconds: 60 },
-        { label: 'Couch Stretch — Left', seconds: 60 },
-        { label: 'Couch Stretch — Right', seconds: 60 },
-        { label: 'Hamstring Stretch — Left', seconds: 45 },
-        { label: 'Hamstring Stretch — Right', seconds: 45 },
-        { label: 'Figure-4 Glute Stretch — Left', seconds: 45 },
-        { label: 'Figure-4 Glute Stretch — Right', seconds: 45 },
-        { label: 'Thoracic Open Book — Left', seconds: 40 },
-        { label: 'Thoracic Open Book — Right', seconds: 40 }
+      long: [
+        { label: 'Left Half-Kneeling Hip Flexor', seconds: 75 },
+        { label: 'Right Half-Kneeling Hip Flexor', seconds: 75 },
+        { label: 'Left Couch Stretch', seconds: 75 },
+        { label: 'Right Couch Stretch', seconds: 75 },
+        { label: 'Left Pigeon Pose', seconds: 75 },
+        { label: 'Right Pigeon Pose', seconds: 75 },
+        { label: 'Left Hamstring Stretch', seconds: 75 },
+        { label: 'Right Hamstring Stretch', seconds: 75 },
+        { label: 'Adductor Rock-Back', seconds: 60 },
+        { label: 'Calf Stretch (Wall)', seconds: 60 },
+        { label: 'Thoracic Opener (Open Book)', seconds: 60 },
+        { label: 'Child’s Pose', seconds: 60 },
+        { label: 'Supine Spinal Twist (Left)', seconds: 60 },
+        { label: 'Supine Spinal Twist (Right)', seconds: 60 }
       ],
       quick: [
-        { label: 'Hip Flexor Stretch — Left', seconds: 45 },
-        { label: 'Hip Flexor Stretch — Right', seconds: 45 },
-        { label: 'Hamstring Stretch — Left', seconds: 35 },
-        { label: 'Hamstring Stretch — Right', seconds: 35 },
-        { label: 'Thoracic Open Book — Left', seconds: 30 },
-        { label: 'Thoracic Open Book — Right', seconds: 30 }
+        { label: 'Left Half-Kneeling Hip Flexor', seconds: 60 },
+        { label: 'Right Half-Kneeling Hip Flexor', seconds: 60 },
+        { label: 'Left Pigeon Pose', seconds: 60 },
+        { label: 'Right Pigeon Pose', seconds: 60 },
+        { label: 'Left Hamstring Stretch', seconds: 60 },
+        { label: 'Right Hamstring Stretch', seconds: 60 },
+        { label: 'Chest Opener (Doorway)', seconds: 60 },
+        { label: 'Thoracic Opener (Open Book)', seconds: 60 },
+        { label: 'Child’s Pose', seconds: 60 }
       ]
     };
 
@@ -475,27 +497,19 @@
       resetBtn: document.getElementById('resetBtn'),
       restartStepBtn: document.getElementById('restartStepBtn'),
       startAgainBtn: document.getElementById('startAgainBtn'),
-      autoAdvanceToggle: document.getElementById('autoAdvanceToggle'),
-      vibrateToggle: document.getElementById('vibrateToggle'),
-      soundToggle: document.getElementById('soundToggle'),
-      themeToggle: document.getElementById('themeToggle')
+      themeSelect: document.getElementById('themeSelect')
     };
 
     const state = {
-      mode: 'full',
-      routines: structuredClone(DEFAULT_ROUTINES),
+      mode: 'long',
       stepIndex: 0,
       remaining: 0,
       isRunning: false,
-      autoAdvance: true,
-      vibrate: true,
-      soundOn: false,
-      forceDarkTheme: false,
+      theme: 'system',
       ticker: null,
       endsAt: 0,
       completed: false,
-      completionSeconds: 0,
-      audioCtx: null
+      completionSeconds: 0
     };
 
     function formatClock(totalSeconds) {
@@ -505,9 +519,7 @@
       return `${min}:${sec}`;
     }
 
-    function currentRoutine() {
-      return state.routines[state.mode];
-    }
+    function currentRoutine() { return DEFAULT_ROUTINES[state.mode]; }
 
     function currentStep() {
       return currentRoutine()[state.stepIndex];
@@ -525,21 +537,8 @@
     function saveSettings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         mode: state.mode,
-        autoAdvance: state.autoAdvance,
-        vibrate: state.vibrate,
-        soundOn: state.soundOn,
-        forceDarkTheme: state.forceDarkTheme,
-        routines: state.routines
+        theme: state.theme
       }));
-    }
-
-    function normalizeRoutine(routine, fallback) {
-      if (!Array.isArray(routine) || !routine.length) return fallback;
-      return routine
-        .map((step, idx) => ({
-          label: typeof step.label === 'string' && step.label.trim() ? step.label.trim() : fallback[idx]?.label || `Stretch ${idx + 1}`,
-          seconds: Number.isFinite(step.seconds) ? Math.max(5, Math.min(600, Math.round(step.seconds))) : fallback[idx]?.seconds || 30
-        }));
     }
 
     function loadSettings() {
@@ -547,15 +546,8 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
-        if (parsed.mode === 'full' || parsed.mode === 'quick') state.mode = parsed.mode;
-        if (typeof parsed.autoAdvance === 'boolean') state.autoAdvance = parsed.autoAdvance;
-        if (typeof parsed.vibrate === 'boolean') state.vibrate = parsed.vibrate;
-        if (typeof parsed.soundOn === 'boolean') state.soundOn = parsed.soundOn;
-        if (typeof parsed.forceDarkTheme === 'boolean') state.forceDarkTheme = parsed.forceDarkTheme;
-        if (parsed.routines && typeof parsed.routines === 'object') {
-          state.routines.full = normalizeRoutine(parsed.routines.full, DEFAULT_ROUTINES.full);
-          state.routines.quick = normalizeRoutine(parsed.routines.quick, DEFAULT_ROUTINES.quick);
-        }
+        if (parsed.mode === 'long' || parsed.mode === 'quick') state.mode = parsed.mode;
+        if (parsed.theme === 'system' || parsed.theme === 'light' || parsed.theme === 'dark') state.theme = parsed.theme;
       } catch (_) {
         // Ignore invalid settings and continue with defaults.
       }
@@ -569,50 +561,9 @@
       state.isRunning = false;
     }
 
-    function playStepTone() {
-      if (!state.soundOn) return;
-      try {
-        if (!state.audioCtx) {
-          const Ctx = window.AudioContext || window.webkitAudioContext;
-          if (!Ctx) return;
-          state.audioCtx = new Ctx();
-        }
-
-        if (state.audioCtx.state === 'suspended') {
-          state.audioCtx.resume();
-        }
-
-        const ctx = state.audioCtx;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        gain.gain.value = 0.0001;
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        const now = ctx.currentTime;
-        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-        osc.start(now);
-        osc.stop(now + 0.12);
-      } catch (_) {
-        // Keep app silent if WebAudio fails.
-      }
-    }
-
-    function buzz(pattern = 120) {
-      if (!state.vibrate || !navigator.vibrate) return;
-      navigator.vibrate(pattern);
-    }
-
     function applyTheme() {
-      if (state.forceDarkTheme) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
+      if (state.theme === 'system') return document.documentElement.removeAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', state.theme);
     }
 
     function setPanelOpen(panel, trigger, isOpen) {
@@ -626,31 +577,36 @@
       setPanelOpen(panel, trigger, isOpen);
     }
 
-    function moveStep(index, direction) {
-      const routine = currentRoutine();
-      const target = index + direction;
-      if (target < 0 || target >= routine.length) return;
-
-      [routine[index], routine[target]] = [routine[target], routine[index]];
-
-      if (state.stepIndex === index) state.stepIndex = target;
-      else if (state.stepIndex === target) state.stepIndex = index;
-
-      saveSettings();
-      render();
+    function iconKeyForLabel(label) {
+      const lower = label.toLowerCase();
+      if (lower.includes('hip flexor') || lower.includes('couch')) return 'leg';
+      if (lower.includes('pigeon')) return 'hip';
+      if (lower.includes('hamstring')) return 'hamstring';
+      if (lower.includes('chest')) return 'chest';
+      if (lower.includes('thoracic') || lower.includes('open book') || lower.includes('twist') || lower.includes('spinal')) return 'spine';
+      if (lower.includes('child')) return 'rest';
+      if (lower.includes('calf')) return 'calf';
+      if (lower.includes('adductor')) return 'adductor';
+      return 'rest';
     }
 
-    function updateStepDuration(index, value) {
-      const seconds = Math.max(5, Math.min(600, Number(value) || 30));
-      const routine = currentRoutine();
-      routine[index].seconds = seconds;
+    function iconSvg(icon) {
+      const map = {
+        leg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l3 6 3 1 2 6"></path><path d="M8 19h8"></path></svg>',
+        hip: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="2"></circle><path d="M9 9v6l4 4"></path><path d="M9 13l6-1 3 5"></path></svg>',
+        hamstring: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h8"></path><path d="M13 7l6 10"></path><path d="M9 7l-2 10"></path></svg>',
+        chest: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V8"></path><path d="M12 10l-6-4"></path><path d="M12 10l6-4"></path></svg>',
+        spine: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"></path><path d="M8 7c2 1 6 1 8 0"></path><path d="M8 12c2 1 6 1 8 0"></path><path d="M8 17c2 1 6 1 8 0"></path></svg>',
+        rest: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16h16"></path><path d="M8 16c0-3 2-5 5-5"></path><path d="M13 11l3 2"></path></svg>',
+        calf: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v8"></path><path d="M8 12l5 7"></path><path d="M6 19h8"></path></svg>',
+        adductor: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v7"></path><path d="M12 12l-6 7"></path><path d="M12 12l6 7"></path></svg>'
+      };
+      return map[icon] || map.rest;
+    }
 
-      if (index === state.stepIndex) {
-        state.remaining = Math.min(state.remaining, seconds) || seconds;
-      }
-
-      saveSettings();
-      render();
+    function stepWithIconHtml(label, prefix = '') {
+      const icon = iconSvg(iconKeyForLabel(label));
+      return `<span class="step-with-icon"><span class="stretch-icon" aria-hidden="true">${icon}</span><span>${prefix}${label}</span></span>`;
     }
 
     function buildStepList() {
@@ -664,7 +620,7 @@
         const info = document.createElement('div');
         const name = document.createElement('div');
         name.className = 'step-name';
-        name.textContent = `${index + 1}. ${step.label}`;
+        name.innerHTML = stepWithIconHtml(step.label, `${index + 1}. `);
 
         const jump = document.createElement('button');
         jump.type = 'button';
@@ -680,42 +636,11 @@
         info.appendChild(name);
         info.appendChild(jump);
 
-        const actions = document.createElement('div');
-        actions.className = 'item-actions';
+        const duration = document.createElement('div');
+        duration.className = 'caption';
+        duration.textContent = `${formatClock(step.seconds)}`;
 
-        const durationInput = document.createElement('input');
-        durationInput.type = 'number';
-        durationInput.min = '5';
-        durationInput.max = '600';
-        durationInput.step = '5';
-        durationInput.value = String(step.seconds);
-        durationInput.setAttribute('aria-label', `Duration in seconds for ${step.label}`);
-        durationInput.addEventListener('change', () => updateStepDuration(index, durationInput.value));
-
-        const upBtn = document.createElement('button');
-        upBtn.type = 'button';
-        upBtn.textContent = '↑ Up';
-        upBtn.disabled = index === 0;
-        upBtn.addEventListener('click', () => moveStep(index, -1));
-
-        const downBtn = document.createElement('button');
-        downBtn.type = 'button';
-        downBtn.textContent = '↓ Down';
-        downBtn.disabled = index === routine.length - 1;
-        downBtn.addEventListener('click', () => moveStep(index, 1));
-
-        const resetBtn = document.createElement('button');
-        resetBtn.type = 'button';
-        resetBtn.textContent = 'Reset';
-        resetBtn.addEventListener('click', () => {
-          const defaults = DEFAULT_ROUTINES[state.mode];
-          routine[index].seconds = defaults[index]?.seconds || 30;
-          saveSettings();
-          render();
-        });
-
-        actions.append(durationInput, upBtn, downBtn, resetBtn);
-        li.append(info, actions);
+        li.append(info, duration);
         els.stepList.appendChild(li);
       });
     }
@@ -736,8 +661,8 @@
       const safeProgress = Math.max(0, Math.min(100, routineProgress));
 
       els.timer.textContent = formatClock(state.remaining);
-      els.currentStep.textContent = `${step.label}`;
-      els.stepTitle.textContent = `${step.label}`;
+      els.currentStep.innerHTML = stepWithIconHtml(step.label);
+      els.stepTitle.innerHTML = stepWithIconHtml(step.label);
       els.headerStep.textContent = state.isRunning ? 'Keep breathing and stay tall.' : 'Ready when you are.';
       els.headerRemaining.textContent = `${formatClock(remainingTotalSeconds())} left`;
       els.totals.textContent = `Total remaining: ${formatClock(remainingTotalSeconds())}`;
@@ -746,14 +671,11 @@
       els.stepProgressText.textContent = `Step ${state.stepIndex + 1} of ${routine.length}`;
       els.stepProgressPercent.textContent = `${Math.round(safeProgress)}%`;
       els.status.textContent = state.completed ? 'Routine complete' : state.isRunning ? 'Running' : 'Paused';
-      els.modeCaption.textContent = `Mode: ${state.mode === 'quick' ? 'Quick stretch' : 'Full routine'}`;
+      els.modeCaption.textContent = `Mode: ${state.mode === 'quick' ? 'Quick routine' : 'Long routine'}`;
 
       els.startPauseBtn.textContent = state.isRunning ? '⏸ Pause' : '▶ Start';
-      els.autoAdvanceToggle.checked = state.autoAdvance;
-      els.vibrateToggle.checked = state.vibrate;
-      els.soundToggle.checked = state.soundOn;
-      els.themeToggle.checked = state.forceDarkTheme;
-      els.quickModeToggle.checked = state.mode === 'quick';
+      els.themeSelect.value = state.theme;
+      els.quickModeToggle.value = state.mode;
 
       renderCompletion();
       buildStepList();
@@ -765,8 +687,6 @@
       state.completed = true;
       state.completionSeconds = routineTotalSeconds();
       state.remaining = 0;
-      buzz([80, 30, 120]);
-      playStepTone();
       render();
     }
 
@@ -776,10 +696,6 @@
         state.stepIndex += 1;
         state.remaining = currentStep().seconds;
         state.completed = false;
-        if (!fromAuto) {
-          buzz(80);
-          playStepTone();
-        }
         render();
         if (state.isRunning || fromAuto) startTicker();
       } else {
@@ -792,23 +708,13 @@
         state.stepIndex -= 1;
         state.remaining = currentStep().seconds;
         state.completed = false;
-        buzz(70);
-        playStepTone();
         render();
         if (state.isRunning) startTicker();
       }
     }
 
     function onStepFinished() {
-      buzz(120);
-      playStepTone();
-      if (state.autoAdvance) {
-        nextStep(true);
-      } else {
-        stopTicker();
-        state.remaining = currentStep().seconds;
-        render();
-      }
+      nextStep(true);
     }
 
     function startTicker() {
@@ -873,30 +779,14 @@
     els.routineToggle.addEventListener('click', () => togglePanel(els.routinePanel, els.routineToggle));
     els.settingsToggle.addEventListener('click', () => togglePanel(els.settingsPanel, els.settingsToggle));
 
-    els.autoAdvanceToggle.addEventListener('change', () => {
-      state.autoAdvance = els.autoAdvanceToggle.checked;
-      saveSettings();
-    });
-
-    els.vibrateToggle.addEventListener('change', () => {
-      state.vibrate = els.vibrateToggle.checked;
-      saveSettings();
-    });
-
-    els.soundToggle.addEventListener('change', () => {
-      state.soundOn = els.soundToggle.checked;
-      saveSettings();
-      if (state.soundOn) playStepTone();
-    });
-
-    els.themeToggle.addEventListener('change', () => {
-      state.forceDarkTheme = els.themeToggle.checked;
+    els.themeSelect.addEventListener('change', () => {
+      state.theme = els.themeSelect.value;
       saveSettings();
       applyTheme();
     });
 
     els.quickModeToggle.addEventListener('change', () => {
-      switchMode(els.quickModeToggle.checked ? 'quick' : 'full');
+      switchMode(els.quickModeToggle.value);
     });
 
     if ('serviceWorker' in navigator) {

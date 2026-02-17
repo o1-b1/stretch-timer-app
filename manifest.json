@@ -1,7 +1,7 @@
 {
   "name": "Stretch Timer v3",
   "short_name": "Stretch",
-  "description": "Polished stretch timer PWA with quick mode, customization, themes, and offline support.",
+  "description": "Stretch timer PWA with hardcoded quick/long routines, icons, theme selector, and offline support.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
