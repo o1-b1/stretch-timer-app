@@ -1,16 +1,44 @@
 # Stretch Timer PWA v3
 
-A polished, installable Stretch Timer for daily mobility sessions. The app is a static GitHub Pages site (HTML/CSS/JS + service worker + manifest) with:
+A polished, installable Stretch Timer for daily mobility sessions. The app is a static GitHub Pages site (HTML/CSS/JS + service worker + manifest).
 
-- Sticky app-like header with current stretch and total remaining time.
-- Thumb-friendly controls (Back / Start-Pause / Next / Restart).
-- Clearly visible **Quick Stretch Mode** toggle.
-- Routine customization (move steps up/down + edit durations in seconds).
-- Persistent preferences in `localStorage`.
-- Progress indicator with **Step X of Y** + percentage bar.
-- Completion screen with total time stretched.
-- Optional dark theme toggle that also respects `prefers-color-scheme`.
-- Haptics on step completion (when supported) and optional WebAudio beep.
+## Routines (hardcoded)
+
+### Quick routine (~9 min)
+1. Left Half-Kneeling Hip Flexor — 60s
+2. Right Half-Kneeling Hip Flexor — 60s
+3. Left Pigeon Pose — 60s
+4. Right Pigeon Pose — 60s
+5. Left Hamstring Stretch — 60s
+6. Right Hamstring Stretch — 60s
+7. Chest Opener (Doorway) — 60s
+8. Thoracic Opener (Open Book) — 60s
+9. Child’s Pose — 60s
+
+### Long routine (~20 min)
+1. Left Half-Kneeling Hip Flexor — 75s
+2. Right Half-Kneeling Hip Flexor — 75s
+3. Left Couch Stretch — 75s
+4. Right Couch Stretch — 75s
+5. Left Pigeon Pose — 75s
+6. Right Pigeon Pose — 75s
+7. Left Hamstring Stretch — 75s
+8. Right Hamstring Stretch — 75s
+9. Adductor Rock-Back — 60s
+10. Calf Stretch (Wall) — 60s
+11. Thoracic Opener (Open Book) — 60s
+12. Child’s Pose — 60s
+13. Supine Spinal Twist (Left) — 60s
+14. Supine Spinal Twist (Right) — 60s
+
+## Features
+
+- Quick/Long routine selector.
+- Stretch icons shown for the current step and routine list rows.
+- Theme selector: System / Light / Dark (saved in `localStorage`).
+- Start/Pause, Back, Next, Restart, and Reset controls.
+- Progress indicator with **Step X of Y** and percentage bar.
+- Completion screen with total stretched time.
 - Offline fallback page via service worker.
 
 ## Project files
@@ -23,16 +51,11 @@ A polished, installable Stretch Timer for daily mobility sessions. The app is a 
 
 ## Local testing
 
-Run a local static server from the repo root:
-
 ```bash
 python3 -m http.server 8000
 ```
 
-Open:
-
-- Main app: `http://localhost:8000/`
-- (Optional) PWA checks in Chromium DevTools → Application (Manifest + Service Workers)
+Open `http://localhost:8000/`.
 
 ## GitHub Pages deployment
 
@@ -44,31 +67,6 @@ Open:
    - **Folder**: `/ (root)`
 4. Save.
 
-Your site URL will be:
+Site URL:
 
 `https://<username>.github.io/stretch-timer-app/`
-
-> Replace `<username>` with your GitHub username.
-
-## Add to Home Screen
-
-### iPhone / iPad (Safari)
-
-1. Open the app URL in Safari.
-2. Tap **Share**.
-3. Tap **Add to Home Screen**.
-4. Confirm the name and tap **Add**.
-
-### Android (Chrome)
-
-1. Open the app URL in Chrome.
-2. Tap the browser menu (`⋮`).
-3. Tap **Install app** or **Add to Home screen**.
-4. Confirm installation.
-
-## PWA behavior notes
-
-- `index.html` is **not precached**.
-- Navigations use a **network-first** strategy.
-- When offline and navigation fails, the app serves `offline.html`.
-- Manifest intentionally has no icons yet (add later when ready).
