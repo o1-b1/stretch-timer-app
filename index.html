@@ -250,7 +250,14 @@
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
-    label.setting {
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+    }
+
+    label.setting,
+    .setting {
       display: grid;
       gap: 8px;
       color: var(--text-muted);
@@ -370,6 +377,7 @@
         </div>
 
         <button id="startPauseBtn" type="button" class="primary" aria-label="Start or pause timer">▶ Start</button>
+        <p id="modeDebug" class="caption" style="margin:0; text-align:center;">Mode: Long</p>
       </article>
 
       <article class="card step-card stack">
@@ -410,13 +418,13 @@
 
         <section id="settingsPanel" class="collapsible" aria-hidden="true">
           <div class="settings-grid">
-            <label class="setting" for="quickModeToggle">
+            <div class="setting" aria-label="Routine">
               Routine
-              <select id="quickModeToggle" class="setting-select">
-                <option value="quick">Quick</option>
-                <option value="long">Long</option>
-              </select>
-            </label>
+              <div class="segmented" role="group" aria-label="Select routine length">
+                <button type="button" data-routine-key="quick" aria-pressed="false">Short</button>
+                <button type="button" data-routine-key="long" aria-pressed="true">Long</button>
+              </div>
+            </div>
             <label class="setting" for="themeSelect">
               Theme
               <select id="themeSelect" class="setting-select">
@@ -439,6 +447,7 @@
 
   <script>
     const STORAGE_KEY = 'stretch-timer-settings-v3';
+    const ACTIVE_ROUTINE_KEY = 'stretchTimer.activeRoutine';
 
     const DEFAULT_ROUTINES = {
       long: [
@@ -483,6 +492,7 @@
       headerStep: document.getElementById('headerStep'),
       headerRemaining: document.getElementById('headerRemaining'),
       modeCaption: document.getElementById('modeCaption'),
+      modeDebug: document.getElementById('modeDebug'),
       stepList: document.getElementById('stepList'),
       completionCard: document.getElementById('completionCard'),
       completionSummary: document.getElementById('completionSummary'),
@@ -490,7 +500,7 @@
       settingsToggle: document.getElementById('settingsToggle'),
       routinePanel: document.getElementById('routinePanel'),
       settingsPanel: document.getElementById('settingsPanel'),
-      quickModeToggle: document.getElementById('quickModeToggle'),
+      routineButtons: Array.from(document.querySelectorAll('[data-routine-key]')),
       startPauseBtn: document.getElementById('startPauseBtn'),
       nextBtn: document.getElementById('nextBtn'),
       backBtn: document.getElementById('backBtn'),
@@ -500,8 +510,9 @@
       themeSelect: document.getElementById('themeSelect')
     };
 
+    let activeRoutineKey = 'long';
+
     const state = {
-      mode: 'long',
       stepIndex: 0,
       remaining: 0,
       isRunning: false,
@@ -519,7 +530,7 @@
       return `${min}:${sec}`;
     }
 
-    function currentRoutine() { return DEFAULT_ROUTINES[state.mode]; }
+    function currentRoutine() { return DEFAULT_ROUTINES[activeRoutineKey]; }
 
     function currentStep() {
       return currentRoutine()[state.stepIndex];
@@ -535,18 +546,23 @@
     }
 
     function saveSettings() {
+      localStorage.setItem(ACTIVE_ROUTINE_KEY, activeRoutineKey);
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        mode: state.mode,
         theme: state.theme
       }));
     }
 
     function loadSettings() {
       try {
+        const storedRoutine = localStorage.getItem(ACTIVE_ROUTINE_KEY);
+        if (storedRoutine === 'long' || storedRoutine === 'quick') activeRoutineKey = storedRoutine;
+
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
-        if (parsed.mode === 'long' || parsed.mode === 'quick') state.mode = parsed.mode;
+        if (!storedRoutine && (parsed.mode === 'long' || parsed.mode === 'quick')) {
+          activeRoutineKey = parsed.mode;
+        }
         if (parsed.theme === 'system' || parsed.theme === 'light' || parsed.theme === 'dark') state.theme = parsed.theme;
       } catch (_) {
         // Ignore invalid settings and continue with defaults.
@@ -671,11 +687,16 @@
       els.stepProgressText.textContent = `Step ${state.stepIndex + 1} of ${routine.length}`;
       els.stepProgressPercent.textContent = `${Math.round(safeProgress)}%`;
       els.status.textContent = state.completed ? 'Routine complete' : state.isRunning ? 'Running' : 'Paused';
-      els.modeCaption.textContent = `Mode: ${state.mode === 'quick' ? 'Quick routine' : 'Long routine'}`;
+      els.modeCaption.textContent = `Mode: ${activeRoutineKey === 'quick' ? 'Quick routine' : 'Long routine'}`;
+      els.modeDebug.textContent = `Mode: ${activeRoutineKey === 'quick' ? 'Quick' : 'Long'}`;
 
       els.startPauseBtn.textContent = state.isRunning ? '⏸ Pause' : '▶ Start';
       els.themeSelect.value = state.theme;
-      els.quickModeToggle.value = state.mode;
+      els.routineButtons.forEach((button) => {
+        const isActive = button.dataset.routineKey === activeRoutineKey;
+        button.classList.toggle('primary', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
 
       renderCompletion();
       buildStepList();
@@ -740,12 +761,13 @@
     }
 
     function switchMode(mode) {
-      if (state.mode === mode) return;
-      state.mode = mode;
+      if (mode !== 'quick' && mode !== 'long') return;
+      if (activeRoutineKey === mode) return;
+      activeRoutineKey = mode;
+      stopTicker();
       state.stepIndex = 0;
       state.remaining = currentStep().seconds;
       state.completed = false;
-      stopTicker();
       saveSettings();
       render();
     }
@@ -785,8 +807,10 @@
       applyTheme();
     });
 
-    els.quickModeToggle.addEventListener('change', () => {
-      switchMode(els.quickModeToggle.value);
+    els.routineButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        switchMode(button.dataset.routineKey);
+      });
     });
 
     if ('serviceWorker' in navigator) {
