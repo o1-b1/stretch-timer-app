@@ -3,27 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
+  <meta name="theme-color" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Stretch Timer" />
-  <title>Stretch Timer v3</title>
+  <title>Stretch Timer</title>
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="manifest.json" />
   <style>
     :root {
       color-scheme: light dark;
       --bg: #f3f4f6;
       --surface: #ffffff;
-      --surface-secondary: #eceff3;
+      --surface-secondary: #edf2f7;
       --text: #111827;
-      --text-muted: #6b7280;
-      --border: rgba(17, 24, 39, 0.12);
+      --text-muted: #5b6472;
+      --border: rgba(17, 24, 39, 0.14);
       --accent: #0ea5e9;
       --accent-strong: #0284c7;
       --ok: #10b981;
       --danger: #ef4444;
       --ring-track: rgba(14, 165, 233, 0.2);
-      --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
       --radius-card: 20px;
       --radius-control: 14px;
       --space-1: 4px;
@@ -31,8 +32,8 @@
       --space-3: 12px;
       --space-4: 16px;
       --space-5: 24px;
-      --title: clamp(1.1rem, 2.8vw, 1.3rem);
-      --subtitle: clamp(1rem, 2.3vw, 1.05rem);
+      --title: clamp(1.1rem, 2.6vw, 1.28rem);
+      --subtitle: clamp(1rem, 2vw, 1.06rem);
       --body: 0.95rem;
       --caption: 0.82rem;
     }
@@ -49,7 +50,7 @@
       --ok: #34d399;
       --danger: #f87171;
       --ring-track: rgba(56, 189, 248, 0.22);
-      --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.45);
+      --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.46);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -65,7 +66,7 @@
         --ok: #34d399;
         --danger: #f87171;
         --ring-track: rgba(56, 189, 248, 0.22);
-        --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.45);
+        --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.46);
       }
     }
 
@@ -97,12 +98,158 @@
       padding: var(--space-4);
     }
 
-    .bento-grid {
-      display: grid;
-      gap: var(--space-3);
-      align-items: start;
-      grid-template-columns: 1fr;
+    .bento-grid { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+    .stack { display: grid; gap: var(--space-2); }
+    .app-title { margin: 0; font-size: var(--title); letter-spacing: -0.01em; user-select: none; }
+    .status { margin: 0; color: var(--text-muted); font-size: var(--caption); }
+    .caption { color: var(--text-muted); font-size: var(--caption); }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 650;
+      background: var(--surface-secondary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
+
+    .update-banner {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .update-banner.visible { display: flex; }
+
+    .hero { min-height: min(73dvh, 620px); align-content: space-between; }
+    .timer-wrap { display: grid; place-items: center; gap: var(--space-2); }
+
+    .timer {
+      font-size: clamp(3.7rem, 17vw, 6rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.2s ease;
+    }
+
+    .timer.pulse { transform: scale(1.015); }
+
+    .progress-wrap { display: grid; gap: var(--space-2); }
+    .progress-label { display: flex; justify-content: space-between; gap: var(--space-2); color: var(--text-muted); font-size: var(--caption); font-weight: 630; }
+    .progress-bar { height: 10px; border-radius: 999px; overflow: hidden; background: var(--ring-track); }
+    .progress-bar > span { display: block; width: 0%; height: 100%; background: linear-gradient(90deg, var(--ok), var(--accent)); transition: width 0.34s ease; }
+
+    .current-step { margin: 0; font-size: var(--subtitle); font-weight: 660; }
+    .step-cue { margin: 0; color: var(--text-muted); font-size: var(--caption); }
+
+    .controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+
+    button, input[type="number"], select {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      background: var(--surface-secondary);
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      min-height: 52px;
+      padding: 12px;
+      font-weight: 680;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.2s ease, background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:hover { filter: brightness(0.98); }
+    button:active { transform: scale(0.975); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-color: color-mix(in srgb, var(--accent) 72%, black);
+      color: #04263f;
+      font-weight: 760;
+    }
+
+    .danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 42%, transparent); }
+    .button-icon { min-height: 42px; padding: 8px 12px; border-radius: 999px; font-size: var(--caption); }
+
+    .panel-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+
+    .collapsible {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+    }
+    .collapsible.open { max-height: 1400px; opacity: 1; transform: translateY(0); margin-top: var(--space-3); }
+
+    .settings-grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .setting { display: grid; gap: 8px; color: var(--text-muted); font-weight: 630; }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      background: var(--surface-secondary);
+    }
+
+    .segmented button { min-height: 44px; border-radius: 10px; border-color: transparent; }
+
+    .preview-list, .list, .editor-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+    .list-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      padding: var(--space-3);
+      display: grid;
+      gap: var(--space-2);
+      background: var(--surface-secondary);
+    }
+
+    .list-item.active { border-color: color-mix(in srgb, var(--accent) 58%, var(--border)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 44%, transparent); }
+    .step-name { font-weight: 650; }
+    .preview-drawer summary { cursor: pointer; font-weight: 640; }
+
+    .duration-row { display: grid; grid-template-columns: 1fr 90px; gap: var(--space-2); align-items: center; }
+    .duration-row input[type="number"] { min-height: 44px; padding: 8px; width: 100%; }
+
+    .completion {
+      display: none;
+      margin-top: var(--space-2);
+      text-align: center;
+      border: 1px solid color-mix(in srgb, var(--ok) 38%, var(--border));
+      border-radius: var(--radius-control);
+      padding: var(--space-3);
+      background: color-mix(in srgb, var(--ok) 10%, var(--surface));
+    }
+    .completion.visible { display: block; }
+
+    .debug-panel {
+      display: none;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--surface-secondary) 80%, transparent);
+      padding: 10px;
+      font-size: var(--caption);
+      color: var(--text-muted);
+    }
+    .debug-panel.visible { display: grid; gap: 6px; }
+
+    :focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 78%, white); outline-offset: 2px; }
 
     @media (min-width: 860px) {
       .bento-grid {
@@ -119,245 +266,32 @@
       .panel-card { grid-area: panels; }
     }
 
-    .row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-    .stack { display: grid; gap: var(--space-2); }
-
-    .app-title { margin: 0; font-size: var(--title); letter-spacing: -0.01em; }
-    .status { margin: 0; color: var(--text-muted); font-size: var(--caption); }
-    .caption { color: var(--text-muted); font-size: var(--caption); }
-
-    .pill {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 650;
-      background: var(--surface-secondary);
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .timer-wrap {
-      display: grid;
-      place-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2) 0;
-    }
-
-    .timer {
-      font-size: clamp(3.4rem, 16vw, 5.4rem);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .progress-wrap { display: grid; gap: var(--space-2); }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--space-2);
-      font-size: var(--caption);
-      color: var(--text-muted);
-      font-weight: 620;
-    }
-
-    .progress-bar {
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: var(--ring-track);
-    }
-
-    .progress-bar > span {
-      display: block;
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--ok), var(--accent));
-      transition: width 0.24s ease;
-    }
-
-    .current-step { margin: 0; font-size: var(--subtitle); font-weight: 660; }
-    .step-cue { margin: 0; color: var(--text-muted); font-size: var(--caption); }
-
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
-    }
-
-    button,
-    input[type="number"] {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-control);
-      background: var(--surface-secondary);
-      color: var(--text);
-      font: inherit;
-    }
-
-    button {
-      min-height: 52px;
-      padding: 12px;
-      font-weight: 650;
-      cursor: pointer;
-      transition: transform 0.08s ease, filter 0.12s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    button:active { transform: scale(0.98); }
-    button:hover { filter: brightness(0.98); }
-
-    .primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      border-color: color-mix(in srgb, var(--accent) 72%, black);
-      color: #02253c;
-      font-weight: 760;
-    }
-
-    .danger {
-      color: var(--danger);
-      border-color: color-mix(in srgb, var(--danger) 45%, transparent);
-    }
-
-    .button-icon {
-      min-height: 44px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: var(--caption);
-      font-weight: 700;
-    }
-
-    .panel-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
-
-    .collapsible {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(-2px);
-      transition: max-height 0.28s ease, opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .collapsible.open {
-      max-height: 1200px;
-      opacity: 1;
-      transform: translateY(0);
-      margin-top: var(--space-3);
-    }
-
-    .settings-grid {
-      display: grid;
-      gap: var(--space-2);
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .segmented {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
-    }
-
-    label.setting,
-    .setting {
-      display: grid;
-      gap: 8px;
-      color: var(--text-muted);
-      font-weight: 600;
-      padding: 8px 0;
-    }
-
-    select.setting-select {
-      min-height: 42px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface-secondary);
-      color: var(--text);
-      padding: 8px 10px;
-      font: inherit;
-    }
-
-    .step-with-icon {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stretch-icon {
-      width: 1.1em;
-      height: 1.1em;
-      display: inline-block;
-      color: var(--accent-strong);
-      flex: 0 0 auto;
-    }
-
-    .stretch-icon svg {
-      width: 100%;
-      height: 100%;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: var(--space-2);
-    }
-
-    .list-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-control);
-      padding: var(--space-3);
-      display: grid;
-      gap: var(--space-2);
-      background: var(--surface-secondary);
-    }
-
-    .list-item.active {
-      border-color: color-mix(in srgb, var(--accent) 58%, var(--border));
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 44%, transparent);
-    }
-
-    .step-name { font-weight: 650; }
-
-    .completion {
-      display: none;
-      margin-top: var(--space-2);
-      text-align: center;
-      border: 1px solid color-mix(in srgb, var(--ok) 38%, var(--border));
-      border-radius: var(--radius-control);
-      padding: var(--space-3);
-      background: color-mix(in srgb, var(--ok) 10%, var(--surface));
-    }
-
-    .completion.visible { display: block; }
-
-    :focus-visible {
-      outline: 2px solid color-mix(in srgb, var(--accent) 75%, white);
-      outline-offset: 2px;
-    }
-
     @media (max-width: 760px) {
       .app { gap: var(--space-2); padding-left: var(--space-2); padding-right: var(--space-2); }
       .card { padding: var(--space-3); }
-      .hero { min-height: min(72dvh, 560px); }
+      .hero { min-height: min(74dvh, 580px); }
       .controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
 <body>
   <main class="app">
+    <section id="updateBanner" class="update-banner" role="status" aria-live="polite">
+      <span>Update available.</span>
+      <button id="reloadBtn" type="button" class="primary" aria-label="Reload with latest version">Reload</button>
+    </section>
+
     <section class="bento-grid">
       <article class="card hero stack" aria-label="Main timer">
         <div class="row">
           <div>
-            <h1 class="app-title">Stretch Timer</h1>
+            <h1 id="headerTitle" class="app-title">Stretch Timer</h1>
             <p class="status" id="status">Ready to start</p>
           </div>
-          <div class="pill" id="headerRemaining">--:-- left</div>
+          <div class="row">
+            <button id="debugToggleBtn" class="button-icon" type="button" aria-label="Toggle diagnostics">i</button>
+            <div class="pill" id="headerRemaining">--:-- left</div>
+          </div>
         </div>
 
         <div class="timer-wrap">
@@ -377,7 +311,6 @@
         </div>
 
         <button id="startPauseBtn" type="button" class="primary" aria-label="Start or pause timer">▶ Start</button>
-        <p id="modeDebug" class="caption" style="margin:0; text-align:center;">Mode: Long</p>
       </article>
 
       <article class="card step-card stack">
@@ -400,6 +333,10 @@
         <div class="caption">Routine summary</div>
         <div class="pill" id="totals">Total remaining: --:--</div>
         <div class="pill" id="routineDuration">Routine duration: --:--</div>
+        <details class="preview-drawer">
+          <summary>Upcoming (next 3)</summary>
+          <ul id="previewList" class="preview-list"></ul>
+        </details>
       </article>
 
       <article class="card panel-card stack">
@@ -418,23 +355,34 @@
 
         <section id="settingsPanel" class="collapsible" aria-hidden="true">
           <div class="settings-grid">
-            <div class="setting" aria-label="Routine">
+            <div class="setting">
               Routine
-              <div class="segmented" role="group" aria-label="Select routine length">
-                <button type="button" data-routine-key="quick" aria-pressed="false">Short</button>
-                <button type="button" data-routine-key="long" aria-pressed="true">Long</button>
+              <div class="segmented" role="radiogroup" aria-label="Select routine length" id="routineSegmented">
+                <button type="button" data-routine-key="quick" role="radio" aria-checked="false">Quick</button>
+                <button type="button" data-routine-key="long" role="radio" aria-checked="true">Long</button>
               </div>
             </div>
             <label class="setting" for="themeSelect">
               Theme
-              <select id="themeSelect" class="setting-select">
+              <select id="themeSelect" aria-label="Theme" class="setting-select">
                 <option value="system">System</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
               </select>
             </label>
+            <div class="setting">
+              Version
+              <div id="versionLabel" class="pill">--</div>
+            </div>
+          </div>
+          <div class="setting" style="margin-top:12px;">
+            Edit durations (seconds)
+            <ul id="durationEditor" class="editor-list"></ul>
+            <button id="resetDurationsBtn" type="button">Reset durations to defaults</button>
           </div>
         </section>
+
+        <section id="debugPanel" class="debug-panel" aria-live="polite"></section>
 
         <div id="completionCard" class="completion" aria-live="polite">
           <h2>Routine complete 🎉</h2>
@@ -446,10 +394,10 @@
   </main>
 
   <script>
-    const STORAGE_KEY = 'stretch-timer-settings-v3';
-    const ACTIVE_ROUTINE_KEY = 'stretchTimer.activeRoutine';
+    const APP_VERSION = 'vNext-2026.02.17';
+    const STORAGE_KEY = 'stretch-timer-settings-vnext';
 
-    const DEFAULT_ROUTINES = {
+    const BASE_ROUTINES = {
       long: [
         { label: 'Left Half-Kneeling Hip Flexor', seconds: 75 },
         { label: 'Right Half-Kneeling Hip Flexor', seconds: 75 },
@@ -492,8 +440,8 @@
       headerStep: document.getElementById('headerStep'),
       headerRemaining: document.getElementById('headerRemaining'),
       modeCaption: document.getElementById('modeCaption'),
-      modeDebug: document.getElementById('modeDebug'),
       stepList: document.getElementById('stepList'),
+      previewList: document.getElementById('previewList'),
       completionCard: document.getElementById('completionCard'),
       completionSummary: document.getElementById('completionSummary'),
       routineToggle: document.getElementById('routineToggle'),
@@ -507,12 +455,19 @@
       resetBtn: document.getElementById('resetBtn'),
       restartStepBtn: document.getElementById('restartStepBtn'),
       startAgainBtn: document.getElementById('startAgainBtn'),
-      themeSelect: document.getElementById('themeSelect')
+      themeSelect: document.getElementById('themeSelect'),
+      durationEditor: document.getElementById('durationEditor'),
+      resetDurationsBtn: document.getElementById('resetDurationsBtn'),
+      updateBanner: document.getElementById('updateBanner'),
+      reloadBtn: document.getElementById('reloadBtn'),
+      debugPanel: document.getElementById('debugPanel'),
+      debugToggleBtn: document.getElementById('debugToggleBtn'),
+      headerTitle: document.getElementById('headerTitle'),
+      versionLabel: document.getElementById('versionLabel')
     };
 
-    let activeRoutineKey = 'long';
-
     const state = {
+      activeRoutineKey: 'long',
       stepIndex: 0,
       remaining: 0,
       isRunning: false,
@@ -520,7 +475,11 @@
       ticker: null,
       endsAt: 0,
       completed: false,
-      completionSeconds: 0
+      completionSeconds: 0,
+      routines: structuredClone(BASE_ROUTINES),
+      durations: { quick: [], long: [] },
+      swRegistered: false,
+      debugOpen: false
     };
 
     function formatClock(totalSeconds) {
@@ -530,50 +489,50 @@
       return `${min}:${sec}`;
     }
 
-    function currentRoutine() { return DEFAULT_ROUTINES[activeRoutineKey]; }
-
-    function currentStep() {
-      return currentRoutine()[state.stepIndex];
-    }
-
-    function routineTotalSeconds() {
-      return currentRoutine().reduce((sum, step) => sum + step.seconds, 0);
-    }
+    function currentRoutine() { return state.routines[state.activeRoutineKey]; }
+    function currentStep() { return currentRoutine()[state.stepIndex]; }
+    function routineTotalSeconds() { return currentRoutine().reduce((sum, step) => sum + step.seconds, 0); }
 
     function remainingTotalSeconds() {
       const routine = currentRoutine();
       return routine.slice(state.stepIndex + 1).reduce((sum, step) => sum + step.seconds, 0) + state.remaining;
     }
 
-    function saveSettings() {
-      localStorage.setItem(ACTIVE_ROUTINE_KEY, activeRoutineKey);
+    function persistSettings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        theme: state.theme
+        theme: state.theme,
+        activeRoutineKey: state.activeRoutineKey,
+        durations: state.durations
       }));
     }
 
-    function loadSettings() {
-      try {
-        const storedRoutine = localStorage.getItem(ACTIVE_ROUTINE_KEY);
-        if (storedRoutine === 'long' || storedRoutine === 'quick') activeRoutineKey = storedRoutine;
+    function applyDurationOverrides(overrides) {
+      ['quick', 'long'].forEach((key) => {
+        const list = BASE_ROUTINES[key];
+        const provided = Array.isArray(overrides?.[key]) ? overrides[key] : [];
+        state.durations[key] = list.map((step, idx) => {
+          const value = Number(provided[idx]);
+          return Number.isFinite(value) ? Math.min(600, Math.max(15, Math.round(value))) : step.seconds;
+        });
+        state.routines[key] = list.map((step, idx) => ({ ...step, seconds: state.durations[key][idx] }));
+      });
+    }
 
+    function loadSettings() {
+      applyDurationOverrides(null);
+      try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
-        if (!storedRoutine && (parsed.mode === 'long' || parsed.mode === 'quick')) {
-          activeRoutineKey = parsed.mode;
-        }
         if (parsed.theme === 'system' || parsed.theme === 'light' || parsed.theme === 'dark') state.theme = parsed.theme;
-      } catch (_) {
-        // Ignore invalid settings and continue with defaults.
-      }
+        if (parsed.activeRoutineKey === 'quick' || parsed.activeRoutineKey === 'long') state.activeRoutineKey = parsed.activeRoutineKey;
+        applyDurationOverrides(parsed.durations);
+      } catch (_) {}
     }
 
     function stopTicker() {
-      if (state.ticker) {
-        clearInterval(state.ticker);
-        state.ticker = null;
-      }
+      if (state.ticker) clearInterval(state.ticker);
+      state.ticker = null;
       state.isRunning = false;
     }
 
@@ -588,56 +547,23 @@
       trigger.setAttribute('aria-expanded', String(isOpen));
     }
 
-    function togglePanel(panel, trigger) {
-      const isOpen = !panel.classList.contains('open');
-      setPanelOpen(panel, trigger, isOpen);
-    }
-
-    function iconKeyForLabel(label) {
-      const lower = label.toLowerCase();
-      if (lower.includes('hip flexor') || lower.includes('couch')) return 'leg';
-      if (lower.includes('pigeon')) return 'hip';
-      if (lower.includes('hamstring')) return 'hamstring';
-      if (lower.includes('chest')) return 'chest';
-      if (lower.includes('thoracic') || lower.includes('open book') || lower.includes('twist') || lower.includes('spinal')) return 'spine';
-      if (lower.includes('child')) return 'rest';
-      if (lower.includes('calf')) return 'calf';
-      if (lower.includes('adductor')) return 'adductor';
-      return 'rest';
-    }
-
-    function iconSvg(icon) {
-      const map = {
-        leg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l3 6 3 1 2 6"></path><path d="M8 19h8"></path></svg>',
-        hip: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="2"></circle><path d="M9 9v6l4 4"></path><path d="M9 13l6-1 3 5"></path></svg>',
-        hamstring: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h8"></path><path d="M13 7l6 10"></path><path d="M9 7l-2 10"></path></svg>',
-        chest: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V8"></path><path d="M12 10l-6-4"></path><path d="M12 10l6-4"></path></svg>',
-        spine: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"></path><path d="M8 7c2 1 6 1 8 0"></path><path d="M8 12c2 1 6 1 8 0"></path><path d="M8 17c2 1 6 1 8 0"></path></svg>',
-        rest: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16h16"></path><path d="M8 16c0-3 2-5 5-5"></path><path d="M13 11l3 2"></path></svg>',
-        calf: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v8"></path><path d="M8 12l5 7"></path><path d="M6 19h8"></path></svg>',
-        adductor: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v7"></path><path d="M12 12l-6 7"></path><path d="M12 12l6 7"></path></svg>'
-      };
-      return map[icon] || map.rest;
+    function iconSvg() {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l3 6 3 1 2 6"></path><path d="M8 19h8"></path></svg>';
     }
 
     function stepWithIconHtml(label, prefix = '') {
-      const icon = iconSvg(iconKeyForLabel(label));
-      return `<span class="step-with-icon"><span class="stretch-icon" aria-hidden="true">${icon}</span><span>${prefix}${label}</span></span>`;
+      return `<span style="display:inline-flex;align-items:center;gap:8px;"><span aria-hidden="true" style="width:1.1em;height:1.1em;color:var(--accent-strong);display:inline-block;">${iconSvg()}</span><span>${prefix}${label}</span></span>`;
     }
 
     function buildStepList() {
       const routine = currentRoutine();
       els.stepList.innerHTML = '';
-
       routine.forEach((step, index) => {
         const li = document.createElement('li');
         li.className = `list-item${index === state.stepIndex ? ' active' : ''}`;
-
-        const info = document.createElement('div');
         const name = document.createElement('div');
         name.className = 'step-name';
         name.innerHTML = stepWithIconHtml(step.label, `${index + 1}. `);
-
         const jump = document.createElement('button');
         jump.type = 'button';
         jump.textContent = 'Jump to step';
@@ -648,24 +574,82 @@
           render();
           if (state.isRunning) startTicker();
         });
-
-        info.appendChild(name);
-        info.appendChild(jump);
-
         const duration = document.createElement('div');
         duration.className = 'caption';
-        duration.textContent = `${formatClock(step.seconds)}`;
-
-        li.append(info, duration);
+        duration.textContent = formatClock(step.seconds);
+        li.append(name, jump, duration);
         els.stepList.appendChild(li);
+      });
+    }
+
+    function buildPreview() {
+      const routine = currentRoutine();
+      const upcoming = routine.slice(state.stepIndex + 1, state.stepIndex + 4);
+      els.previewList.innerHTML = '';
+      if (!upcoming.length) {
+        const li = document.createElement('li');
+        li.className = 'caption';
+        li.textContent = 'No upcoming steps.';
+        els.previewList.appendChild(li);
+        return;
+      }
+      upcoming.forEach((step) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.textContent = `${step.label} · ${formatClock(step.seconds)}`;
+        els.previewList.appendChild(li);
+      });
+    }
+
+    function buildDurationEditor() {
+      els.durationEditor.innerHTML = '';
+      currentRoutine().forEach((step, index) => {
+        const li = document.createElement('li');
+        li.className = 'duration-row';
+        const label = document.createElement('label');
+        label.textContent = step.label;
+        label.setAttribute('for', `duration-${index}`);
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `duration-${index}`;
+        input.min = '15';
+        input.max = '600';
+        input.step = '5';
+        input.value = String(step.seconds);
+        input.setAttribute('aria-label', `${step.label} duration in seconds`);
+        input.addEventListener('change', () => {
+          const safe = Math.min(600, Math.max(15, Math.round(Number(input.value) || step.seconds)));
+          state.durations[state.activeRoutineKey][index] = safe;
+          state.routines[state.activeRoutineKey][index].seconds = safe;
+          if (state.stepIndex === index) state.remaining = Math.min(state.remaining, safe) || safe;
+          input.value = String(safe);
+          state.completed = false;
+          persistSettings();
+          render();
+          if (state.isRunning) startTicker();
+        });
+
+        li.append(label, input);
+        els.durationEditor.appendChild(li);
       });
     }
 
     function renderCompletion() {
       els.completionCard.classList.toggle('visible', state.completed);
-      if (state.completed) {
-        els.completionSummary.textContent = `Great work! Total time stretched: ${formatClock(state.completionSeconds)}.`;
-      }
+      if (state.completed) els.completionSummary.textContent = `Great work! Total time stretched: ${formatClock(state.completionSeconds)}.`;
+    }
+
+    function updateDebugPanel() {
+      if (!state.debugOpen) return;
+      const lines = [
+        `mode: ${state.activeRoutineKey}`,
+        `theme: ${state.theme}`,
+        `sw registered: ${state.swRegistered ? 'yes' : 'no'}`,
+        `cache version: stretch-timer-vnext-2026-02-17`,
+        `app version: ${APP_VERSION}`
+      ];
+      els.debugPanel.innerHTML = lines.map((line) => `<div>${line}</div>`).join('');
     }
 
     function render() {
@@ -677,6 +661,7 @@
       const safeProgress = Math.max(0, Math.min(100, routineProgress));
 
       els.timer.textContent = formatClock(state.remaining);
+      els.timer.classList.toggle('pulse', state.isRunning);
       els.currentStep.innerHTML = stepWithIconHtml(step.label);
       els.stepTitle.innerHTML = stepWithIconHtml(step.label);
       els.headerStep.textContent = state.isRunning ? 'Keep breathing and stay tall.' : 'Ready when you are.';
@@ -687,20 +672,25 @@
       els.stepProgressText.textContent = `Step ${state.stepIndex + 1} of ${routine.length}`;
       els.stepProgressPercent.textContent = `${Math.round(safeProgress)}%`;
       els.status.textContent = state.completed ? 'Routine complete' : state.isRunning ? 'Running' : 'Paused';
-      els.modeCaption.textContent = `Mode: ${activeRoutineKey === 'quick' ? 'Quick routine' : 'Long routine'}`;
-      els.modeDebug.textContent = `Mode: ${activeRoutineKey === 'quick' ? 'Quick' : 'Long'}`;
-
+      els.modeCaption.textContent = `Mode: ${state.activeRoutineKey === 'quick' ? 'Quick routine' : 'Long routine'}`;
       els.startPauseBtn.textContent = state.isRunning ? '⏸ Pause' : '▶ Start';
       els.themeSelect.value = state.theme;
+      els.versionLabel.textContent = APP_VERSION;
+
       els.routineButtons.forEach((button) => {
-        const isActive = button.dataset.routineKey === activeRoutineKey;
+        const isActive = button.dataset.routineKey === state.activeRoutineKey;
         button.classList.toggle('primary', isActive);
         button.setAttribute('aria-pressed', String(isActive));
+        button.setAttribute('aria-checked', String(isActive));
+        button.tabIndex = isActive ? 0 : -1;
       });
 
-      renderCompletion();
       buildStepList();
+      buildPreview();
+      buildDurationEditor();
+      renderCompletion();
       applyTheme();
+      updateDebugPanel();
     }
 
     function showCompletion() {
@@ -734,10 +724,6 @@
       }
     }
 
-    function onStepFinished() {
-      nextStep(true);
-    }
-
     function startTicker() {
       state.completed = false;
       stopTicker();
@@ -748,8 +734,8 @@
         const secondsLeft = Math.max(0, Math.ceil((state.endsAt - Date.now()) / 1000));
         state.remaining = secondsLeft;
         render();
-        if (secondsLeft <= 0) onStepFinished();
-      }, 200);
+        if (secondsLeft <= 0) nextStep(true);
+      }, 220);
     }
 
     function resetRoutine() {
@@ -762,14 +748,68 @@
 
     function switchMode(mode) {
       if (mode !== 'quick' && mode !== 'long') return;
-      if (activeRoutineKey === mode) return;
-      activeRoutineKey = mode;
+      if (state.activeRoutineKey === mode) return;
+      state.activeRoutineKey = mode;
       stopTicker();
       state.stepIndex = 0;
       state.remaining = currentStep().seconds;
       state.completed = false;
-      saveSettings();
+      persistSettings();
       render();
+    }
+
+    function setupSegmentedKeyboard() {
+      const seg = document.getElementById('routineSegmented');
+      seg.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+        event.preventDefault();
+        const order = ['quick', 'long'];
+        const currentIdx = order.indexOf(state.activeRoutineKey);
+        const dir = (event.key === 'ArrowRight' || event.key === 'ArrowDown') ? 1 : -1;
+        const nextMode = order[(currentIdx + dir + order.length) % order.length];
+        switchMode(nextMode);
+        const target = els.routineButtons.find((b) => b.dataset.routineKey === nextMode);
+        if (target) target.focus();
+      });
+    }
+
+    function showUpdateBanner(registration) {
+      if (!registration?.waiting) return;
+      els.updateBanner.classList.add('visible');
+      els.reloadBtn.onclick = () => {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      };
+    }
+
+    function setupServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') return;
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('./sw.js');
+          state.swRegistered = true;
+          updateDebugPanel();
+
+          if (registration.waiting) showUpdateBanner(registration);
+
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner(registration);
+              }
+            });
+          });
+
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+          });
+        } catch (_) {
+          state.swRegistered = false;
+          updateDebugPanel();
+        }
+      });
     }
 
     els.startPauseBtn.addEventListener('click', () => {
@@ -798,29 +838,50 @@
       render();
     });
 
-    els.routineToggle.addEventListener('click', () => togglePanel(els.routinePanel, els.routineToggle));
-    els.settingsToggle.addEventListener('click', () => togglePanel(els.settingsPanel, els.settingsToggle));
+    els.routineToggle.addEventListener('click', () => setPanelOpen(els.routinePanel, els.routineToggle, !els.routinePanel.classList.contains('open')));
+    els.settingsToggle.addEventListener('click', () => setPanelOpen(els.settingsPanel, els.settingsToggle, !els.settingsPanel.classList.contains('open')));
 
     els.themeSelect.addEventListener('change', () => {
       state.theme = els.themeSelect.value;
-      saveSettings();
+      persistSettings();
       applyTheme();
+      render();
     });
 
-    els.routineButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        switchMode(button.dataset.routineKey);
-      });
+    els.routineButtons.forEach((button) => button.addEventListener('click', () => switchMode(button.dataset.routineKey)));
+
+    els.resetDurationsBtn.addEventListener('click', () => {
+      applyDurationOverrides(null);
+      state.stepIndex = 0;
+      state.remaining = currentStep().seconds;
+      state.completed = false;
+      persistSettings();
+      render();
     });
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    els.debugToggleBtn.addEventListener('click', () => {
+      state.debugOpen = !state.debugOpen;
+      els.debugPanel.classList.toggle('visible', state.debugOpen);
+      updateDebugPanel();
+    });
+
+    let longPressTimer = null;
+    els.headerTitle.addEventListener('pointerdown', () => {
+      longPressTimer = setTimeout(() => {
+        state.debugOpen = !state.debugOpen;
+        els.debugPanel.classList.toggle('visible', state.debugOpen);
+        updateDebugPanel();
+      }, 700);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((evt) => {
+      els.headerTitle.addEventListener(evt, () => {
+        if (longPressTimer) clearTimeout(longPressTimer);
       });
-    }
+    });
 
     loadSettings();
-    applyTheme();
+    setupSegmentedKeyboard();
+    setupServiceWorker();
     state.remaining = currentStep().seconds;
     setPanelOpen(els.routinePanel, els.routineToggle, false);
     setPanelOpen(els.settingsPanel, els.settingsToggle, false);

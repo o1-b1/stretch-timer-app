@@ -1,72 +1,81 @@
-# Stretch Timer PWA v3
+# Stretch Timer PWA (vNext)
 
-A polished, installable Stretch Timer for daily mobility sessions. The app is a static GitHub Pages site (HTML/CSS/JS + service worker + manifest).
+A polished, installable Stretch Timer for daily mobility sessions. It remains a fully static GitHub Pages app (HTML/CSS/JS + manifest + service worker).
 
-## Routines (hardcoded)
+## What’s improved in vNext
 
-### Quick routine (~9 min)
-1. Left Half-Kneeling Hip Flexor — 60s
-2. Right Half-Kneeling Hip Flexor — 60s
-3. Left Pigeon Pose — 60s
-4. Right Pigeon Pose — 60s
-5. Left Hamstring Stretch — 60s
-6. Right Hamstring Stretch — 60s
-7. Chest Opener (Doorway) — 60s
-8. Thoracic Opener (Open Book) — 60s
-9. Child’s Pose — 60s
+- Timer-first layout that fits iPhone screens without requiring scrolling on first load.
+- Better touch ergonomics (larger touch targets, spacing, pressed states, soft transitions).
+- Accessible routine segmented control (keyboard arrows + proper ARIA radio semantics).
+- Theme selector (System / Light / Dark) persisted in local storage.
+- Routine preview drawer with the next 3 upcoming stretches.
+- Safe duration editing UI per routine with reset-to-default support.
+- Hidden diagnostics panel (toggle via long-press on title or `i` button).
+- Service worker update flow with in-app **Update available** banner.
+- Cache strategy designed to reduce stale shell behavior after deploys.
 
-### Long routine (~20 min)
-1. Left Half-Kneeling Hip Flexor — 75s
-2. Right Half-Kneeling Hip Flexor — 75s
-3. Left Couch Stretch — 75s
-4. Right Couch Stretch — 75s
-5. Left Pigeon Pose — 75s
-6. Right Pigeon Pose — 75s
-7. Left Hamstring Stretch — 75s
-8. Right Hamstring Stretch — 75s
-9. Adductor Rock-Back — 60s
-10. Calf Stretch (Wall) — 60s
-11. Thoracic Opener (Open Book) — 60s
-12. Child’s Pose — 60s
-13. Supine Spinal Twist (Left) — 60s
-14. Supine Spinal Twist (Right) — 60s
+## PWA + GitHub Pages setup
 
-## Features
+This repository assumes a **project Pages** URL such as:
 
-- Quick/Long routine selector.
-- Stretch icons shown for the current step and routine list rows.
-- Theme selector: System / Light / Dark (saved in `localStorage`).
-- Start/Pause, Back, Next, Restart, and Reset controls.
-- Progress indicator with **Step X of Y** and percentage bar.
-- Completion screen with total stretched time.
-- Offline fallback page via service worker.
+`https://<username>.github.io/stretch-timer-app/`
 
-## Project files
+Manifest values are configured for this path:
 
-- `index.html` – app UI and logic.
-- `sw.js` – cache handling and offline navigation fallback.
-- `offline.html` – shown when navigation fails offline.
-- `manifest.json` – PWA metadata for installability.
-- `404.html` – GitHub Pages redirect helper.
+- `start_url`: `/stretch-timer-app/`
+- `scope`: `/stretch-timer-app/`
+- `display`: `standalone`
+
+If your repo name changes, update `manifest.json` to match the new project path.
 
 ## Local testing
+
+Run a static server from repo root:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/`.
+Open:
 
-## GitHub Pages deployment
+- `http://localhost:8000/`
 
-1. Push this repo to GitHub.
-2. Open **Settings → Pages**.
-3. Configure:
-   - **Source**: Deploy from a branch
-   - **Branch**: `main` (or your deployment branch)
-   - **Folder**: `/ (root)`
-4. Save.
+Service worker tests are more realistic over HTTPS (GitHub Pages), but local behavior still validates core flow.
 
-Site URL:
+## iPhone Add to Home Screen (A2HS)
 
-`https://<username>.github.io/stretch-timer-app/`
+1. Open the deployed GitHub Pages URL in Safari.
+2. Tap **Share**.
+3. Tap **Add to Home Screen**.
+4. Launch from the created app icon.
+
+Expected behavior:
+
+- App opens in standalone mode.
+- Theme and routine settings persist.
+- Offline shell still opens after first successful visit.
+
+## Update behavior (stale-cache prevention)
+
+Service worker strategy:
+
+- **Navigation requests**: network-first (`index.html`), fallback to cached shell, then offline page.
+- **Static/same-origin assets**: cache-first with runtime fill.
+- Old cache versions are removed on activate.
+
+When a new service worker is installed and waiting, the app shows an **Update available** banner.
+Tap **Reload** to activate the new worker and refresh to latest files.
+
+## Routine + settings reset
+
+- **Reset routine** button: resets current routine progress to step 1.
+- **Reset durations to defaults** button (Settings): restores default durations for quick + long routines.
+- To fully clear all persisted state manually, clear site storage in browser settings.
+
+## Project files
+
+- `index.html` – app UI, interaction logic, routine management, settings, diagnostics, SW update banner.
+- `sw.js` – cache/version strategy and fetch handling.
+- `manifest.json` – install metadata for project GitHub Pages path.
+- `404.html` – GitHub Pages redirect helper.
+- `offline.html` – fallback page when navigation cannot be fulfilled.
