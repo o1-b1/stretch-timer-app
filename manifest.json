@@ -1,11 +1,12 @@
 {
-  "name": "Stretch Timer v3",
+  "name": "Stretch Timer",
   "short_name": "Stretch",
-  "description": "Stretch timer PWA with hardcoded quick/long routines, icons, theme selector, and offline support.",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "description": "Premium stretch timer PWA with quick/long routines, offline support, theme controls, and editable durations.",
+  "id": "/stretch-timer-app/",
+  "start_url": "/stretch-timer-app/",
+  "scope": "/stretch-timer-app/",
   "display": "standalone",
-  "background_color": "#020617",
+  "orientation": "portrait",
+  "background_color": "#030712",
   "theme_color": "#0f172a"
 }

@@ -8,8 +8,8 @@
     (function () {
       const path = window.location.pathname;
       const parts = path.split('/').filter(Boolean);
-      const isProjectPages = window.location.hostname.endsWith('github.io') && parts.length > 0;
-      const repoBase = isProjectPages ? `/${parts[0]}` : '';
+      const isGithubProject = window.location.hostname.endsWith('github.io') && parts.length > 0;
+      const repoBase = isGithubProject ? `/${parts[0]}` : '';
       const target = `${repoBase}/index.html${window.location.search}${window.location.hash}`;
       window.location.replace(target);
     })();

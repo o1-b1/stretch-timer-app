@@ -1,63 +1,75 @@
-const CACHE_VERSION = 'stretch-timer-v3';
+const CACHE_VERSION = 'stretch-timer-vnext-2026-02-17';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-const STATIC_ASSETS = [
+const APP_SHELL = [
+  './',
+  './index.html',
   './manifest.json',
-  './offline.html',
-  './404.html'
+  './404.html',
+  './offline.html'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then((cache) => cache.addAll(APP_SHELL))
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(
-        keys
-          .filter((key) => ![STATIC_CACHE, RUNTIME_CACHE].includes(key))
-          .map((key) => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((key) => ![STATIC_CACHE, RUNTIME_CACHE].includes(key)).map((key) => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
+  const url = new URL(request.url);
+  const sameOrigin = url.origin === self.location.origin;
+
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
-        return await fetch(request);
+        const fresh = await fetch(request);
+        const cache = await caches.open(RUNTIME_CACHE);
+        cache.put('./index.html', fresh.clone());
+        return fresh;
       } catch (_) {
-        const fallback = await caches.match('./offline.html');
-        return fallback || Response.error();
+        const cachedDoc = await caches.match('./index.html');
+        if (cachedDoc) return cachedDoc;
+        const offline = await caches.match('./offline.html');
+        return offline || Response.error();
       }
     })());
     return;
   }
 
-  event.respondWith((async () => {
-    const cached = await caches.match(request);
-    if (cached) return cached;
+  if (sameOrigin) {
+    event.respondWith((async () => {
+      const staticHit = await caches.match(request);
+      if (staticHit) return staticHit;
 
-    try {
-      const response = await fetch(request);
-      if (response && response.status === 200 && response.type === 'basic') {
-        const copy = response.clone();
-        const runtime = await caches.open(RUNTIME_CACHE);
-        runtime.put(request, copy);
+      try {
+        const response = await fetch(request);
+        if (response && response.status === 200) {
+          const cache = await caches.open(RUNTIME_CACHE);
+          cache.put(request, response.clone());
+        }
+        return response;
+      } catch (_) {
+        const cached = await caches.match(request);
+        return cached || Response.error();
       }
-      return response;
-    } catch (_) {
-      return Response.error();
-    }
-  })());
+    })());
+  }
 });
