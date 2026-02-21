@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'stretch-timer-vnext-2026-02-17';
+const CACHE_VERSION = 'stretch-timer-v3-2026-02-21';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
