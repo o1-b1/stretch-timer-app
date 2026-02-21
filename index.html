@@ -19,7 +19,7 @@
       --text:       #000000;
       --text2:      #6E6E73;
       --border:     rgba(0,0,0,0.09);
-      --accent:     #FF5F1F;
+      --accent:     #FF8C00;
       --rest:       #34C759;
       --shadow:     0 2px 24px rgba(0,0,0,0.07);
       --tab-h:      49px;
@@ -33,13 +33,13 @@
       :root:not([data-theme="light"]) {
         --bg: #000000; --surface: #1C1C1E; --surface2: #2C2C2E;
         --text: #FFFFFF; --text2: #8E8E93; --border: rgba(255,255,255,0.10);
-        --shadow: none; --bg-glass: rgba(0,0,0,0.88);
+        --shadow: none; --bg-glass: rgba(0,0,0,0.88); --accent: #FF9F0A;
       }
     }
     :root[data-theme="dark"] {
       --bg: #000000; --surface: #1C1C1E; --surface2: #2C2C2E;
       --text: #FFFFFF; --text2: #8E8E93; --border: rgba(255,255,255,0.10);
-      --shadow: none; --bg-glass: rgba(0,0,0,0.88);
+      --shadow: none; --bg-glass: rgba(0,0,0,0.88); --accent: #FF9F0A;
     }
     :root[data-theme="light"] {
       --bg: #F5F5F7; --surface: #FFFFFF; --surface2: #E5E5EA;
@@ -123,7 +123,7 @@
     }
     .wordmark {
       font-size: 1.45rem;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -0.04em;
       user-select: none;
     }
@@ -177,9 +177,9 @@
       margin: 0 auto; flex-shrink: 0; position: relative;
     }
     .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
+    .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 5; }
     .ring-fg {
-      fill: none; stroke: var(--accent); stroke-width: 6;
+      fill: none; stroke: var(--accent); stroke-width: 5;
       stroke-linecap: round; stroke-dasharray: 276.46; stroke-dashoffset: 0;
       transition: stroke 0.4s ease;
     }
@@ -229,11 +229,11 @@
     .play-btn {
       width: 72px; height: 72px;
       background: var(--accent); color: #fff; font-size: 1.5rem;
-      box-shadow: 0 6px 28px rgba(255,95,31,0.38);
+      box-shadow: 0 4px 20px rgba(255,140,0,0.22);
     }
     .play-btn.rest-mode {
       background: var(--rest);
-      box-shadow: 0 6px 28px rgba(52,199,89,0.38);
+      box-shadow: 0 4px 20px rgba(52,199,89,0.22);
     }
     .sec-btn {
       width: 52px; height: 52px;
@@ -267,7 +267,7 @@
     .completion.hidden { display: none; }
     .completion-icon { font-size: 4rem; margin-bottom: 4px; }
     .completion-title {
-      font-size: 2.4rem; font-weight: 800; letter-spacing: -0.04em;
+      font-size: 2.4rem; font-weight: 700; letter-spacing: -0.04em;
     }
     .completion-sub { font-size: 0.95rem; color: var(--text2); margin-bottom: 8px; }
 
@@ -383,7 +383,7 @@
       padding: 18px 16px; border: 1px solid var(--border); box-shadow: var(--shadow);
     }
     .stat-val {
-      font-size: 2.1rem; font-weight: 800; color: var(--accent);
+      font-size: 2.1rem; font-weight: 700; color: var(--accent);
       letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px;
     }
     .stat-lbl {
