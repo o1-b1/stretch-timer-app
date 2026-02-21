@@ -3,889 +3,799 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e0c" media="(prefers-color-scheme: dark)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Stretch Timer" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Stretch" />
   <title>Stretch Timer</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
+    /* ── TOKENS ── */
     :root {
-      color-scheme: light dark;
-      --bg: #f3f4f6;
-      --surface: #ffffff;
-      --surface-secondary: #edf2f7;
-      --text: #111827;
-      --text-muted: #5b6472;
-      --border: rgba(17, 24, 39, 0.14);
-      --accent: #0ea5e9;
-      --accent-strong: #0284c7;
-      --ok: #10b981;
-      --danger: #ef4444;
-      --ring-track: rgba(14, 165, 233, 0.2);
-      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --radius-card: 20px;
-      --radius-control: 14px;
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 24px;
-      --title: clamp(1.1rem, 2.6vw, 1.28rem);
-      --subtitle: clamp(1rem, 2vw, 1.06rem);
-      --body: 0.95rem;
-      --caption: 0.82rem;
+      --bg:        #faf8f5;
+      --surface:   #ffffff;
+      --surface2:  #f2efe9;
+      --text:      #1c1b18;
+      --muted:     #7a7870;
+      --border:    rgba(28,27,24,0.10);
+      --accent:    #b85c2a;
+      --accent2:   #e07a45;
+      --accent-bg: #f5e8df;
+      --rest:      #3a7a6a;
+      --rest-bg:   #ddf0ea;
+      --shadow:    0 2px 16px rgba(28,27,24,0.07);
+      --radius:    20px;
+      --ff-serif:  'Lora', Georgia, serif;
+      --ff-sans:   'Jost', sans-serif;
     }
-
-    :root[data-theme="dark"] {
-      --bg: #030712;
-      --surface: #111827;
-      --surface-secondary: #1f2937;
-      --text: #f9fafb;
-      --text-muted: #9ca3af;
-      --border: rgba(156, 163, 175, 0.28);
-      --accent: #38bdf8;
-      --accent-strong: #0ea5e9;
-      --ok: #34d399;
-      --danger: #f87171;
-      --ring-track: rgba(56, 189, 248, 0.22);
-      --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.46);
-    }
-
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --bg: #030712;
-        --surface: #111827;
-        --surface-secondary: #1f2937;
-        --text: #f9fafb;
-        --text-muted: #9ca3af;
-        --border: rgba(156, 163, 175, 0.28);
-        --accent: #38bdf8;
-        --accent-strong: #0ea5e9;
-        --ok: #34d399;
-        --danger: #f87171;
-        --ring-track: rgba(56, 189, 248, 0.22);
-        --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.46);
+        --bg:#0e0e0c; --surface:#1a1a16; --surface2:#242420;
+        --text:#f0ede6; --muted:#7a7870; --border:rgba(240,237,230,0.10);
+        --accent:#e07a45; --accent2:#f0a070; --accent-bg:#2e1c10;
+        --rest:#5aaa90; --rest-bg:#0e2820; --shadow:0 2px 20px rgba(0,0,0,0.35);
       }
     }
+    :root[data-theme="dark"] {
+      --bg:#0e0e0c; --surface:#1a1a16; --surface2:#242420;
+      --text:#f0ede6; --muted:#7a7870; --border:rgba(240,237,230,0.10);
+      --accent:#e07a45; --accent2:#f0a070; --accent-bg:#2e1c10;
+      --rest:#5aaa90; --rest-bg:#0e2820; --shadow:0 2px 20px rgba(0,0,0,0.35);
+    }
+    :root[data-theme="light"] {
+      --bg:#faf8f5; --surface:#ffffff; --surface2:#f2efe9;
+      --text:#1c1b18; --muted:#7a7870; --border:rgba(28,27,24,0.10);
+      --accent:#b85c2a; --accent2:#e07a45; --accent-bg:#f5e8df;
+      --rest:#3a7a6a; --rest-bg:#ddf0ea; --shadow:0 2px 16px rgba(28,27,24,0.07);
+    }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--ff-sans);
       background: var(--bg);
       color: var(--text);
-      font-size: var(--body);
+      min-height: 100dvh;
+      font-size: 15px;
+      transition: background 0.25s, color 0.25s;
     }
 
     .app {
-      max-width: 980px;
+      max-width: 480px;
       margin: 0 auto;
-      padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-3) calc(var(--space-5) + env(safe-area-inset-bottom));
-      display: grid;
-      gap: var(--space-3);
+      padding: calc(16px + env(safe-area-inset-top)) 18px calc(32px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-soft);
-      padding: var(--space-4);
-    }
-
-    .bento-grid { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-    .stack { display: grid; gap: var(--space-2); }
-    .app-title { margin: 0; font-size: var(--title); letter-spacing: -0.01em; user-select: none; }
-    .status { margin: 0; color: var(--text-muted); font-size: var(--caption); }
-    .caption { color: var(--text-muted); font-size: var(--caption); }
-
-    .pill {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 650;
-      background: var(--surface-secondary);
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .update-banner {
+    /* Update banner */
+    #updateBanner {
       display: none;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-    }
-    .update-banner.visible { display: flex; }
-
-    .hero { min-height: min(73dvh, 620px); align-content: space-between; }
-    .timer-wrap { display: grid; place-items: center; gap: var(--space-2); }
-
-    .timer {
-      font-size: clamp(3.7rem, 17vw, 6rem);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      font-variant-numeric: tabular-nums;
-      transition: transform 0.2s ease;
-    }
-
-    .timer.pulse { transform: scale(1.015); }
-
-    .progress-wrap { display: grid; gap: var(--space-2); }
-    .progress-label { display: flex; justify-content: space-between; gap: var(--space-2); color: var(--text-muted); font-size: var(--caption); font-weight: 630; }
-    .progress-bar { height: 10px; border-radius: 999px; overflow: hidden; background: var(--ring-track); }
-    .progress-bar > span { display: block; width: 0%; height: 100%; background: linear-gradient(90deg, var(--ok), var(--accent)); transition: width 0.34s ease; }
-
-    .current-step { margin: 0; font-size: var(--subtitle); font-weight: 660; }
-    .step-cue { margin: 0; color: var(--text-muted); font-size: var(--caption); }
-
-    .controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
-
-    button, input[type="number"], select {
+      gap: 10px;
+      background: var(--accent-bg);
       border: 1px solid var(--border);
-      border-radius: var(--radius-control);
-      background: var(--surface-secondary);
-      color: var(--text);
-      font: inherit;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      position: sticky;
+      top: 8px;
+      z-index: 20;
+    }
+    #updateBanner.visible { display: flex; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 2px;
+    }
+    .wordmark { font-family: var(--ff-serif); font-size: 1.35rem; letter-spacing: -0.02em; user-select: none; }
+    .wordmark em { color: var(--accent); font-style: italic; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--muted); font-size: 0.82rem; font-family: var(--ff-sans);
+      font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow); transition: transform 0.12s;
+    }
+    .icon-btn:active { transform: scale(0.92); }
+    .pill-remaining {
+      font-size: 0.75rem; font-weight: 500; color: var(--muted);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 5px 10px;
+      font-variant-numeric: tabular-nums; white-space: nowrap;
     }
 
-    button {
-      min-height: 52px;
-      padding: 12px;
-      font-weight: 680;
-      cursor: pointer;
-      transition: transform 0.12s ease, filter 0.2s ease, background-color 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
+    /* Tabs */
+    .tabs {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      background: var(--surface2); border-radius: 14px;
+      padding: 4px; border: 1px solid var(--border);
+    }
+    .tab {
+      padding: 9px 4px; border: none; border-radius: 10px;
+      background: none; font-family: var(--ff-sans);
+      font-size: 0.82rem; font-weight: 500; color: var(--muted);
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.01em;
+    }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+
+    /* Pages */
+    .page { display: none; flex-direction: column; gap: 12px; }
+    .page.active { display: flex; }
+
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+    .card-title { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; }
+
+    /* Timer hero */
+    .timer-hero { display: flex; flex-direction: column; align-items: center; padding: 24px 20px 20px; }
+    .step-name-display { font-family: var(--ff-serif); font-size: 1.3rem; font-weight: 600; text-align: center; line-height: 1.25; margin-bottom: 4px; }
+    .step-cue-display { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 0; }
+
+    /* Ring */
+    .ring-wrap {
+      position: relative; width: min(240px,65vw); height: min(240px,65vw);
+      margin: 14px 0 20px;
+    }
+    .ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 9; }
+    .ring-fg {
+      fill: none; stroke: var(--accent); stroke-width: 9; stroke-linecap: round;
+      stroke-dasharray: 263.89; stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.85s linear, stroke 0.4s ease;
+    }
+    .ring-fg.rest-color { stroke: var(--rest); }
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .ring-time {
+      font-family: var(--ff-serif); font-size: clamp(2.6rem,13vw,3.6rem);
+      font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .ring-phase { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+
+    /* Dots */
+    .step-dots { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; max-width: 300px; }
+    .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s; cursor: pointer;
+    }
+    .dot.done { background: var(--accent); border-color: var(--accent); }
+    .dot.active { background: var(--accent); border-color: var(--accent); opacity: 0.45; }
+    .dot.rest-active { background: var(--rest); border-color: var(--rest); opacity: 0.5; }
+
+    /* Progress */
+    .progress-wrap { width: 100%; margin-bottom: 22px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+    .progress-track { height: 5px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 999px; width: 0%; transition: width 0.5s ease; }
+
+    /* Controls */
+    .play-btn {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: var(--accent); border: none; color: #fff; font-size: 1.4rem; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(184,92,42,0.35); transition: transform 0.15s, box-shadow 0.15s;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+    }
+    .play-btn:active { transform: scale(0.93); }
+    .play-btn.rest-mode { background: var(--rest); box-shadow: 0 4px 20px rgba(58,122,106,0.35); }
+    .sec-controls { display: flex; gap: 10px; align-items: center; }
+    .sec-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+      font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.12s;
+    }
+    .sec-btn:active { transform: scale(0.92); }
+
+    /* Routine segmented */
+    .routine-segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .routine-seg-btn {
+      padding: 12px 8px; border-radius: 14px; border: 2px solid var(--border);
+      background: var(--surface2); font-family: var(--ff-sans); font-size: 0.85rem;
+      font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .routine-seg-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+
+    /* Step list */
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .step-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 13px;
+      border: 1px solid var(--border); background: var(--surface2);
+      font-size: 0.88rem; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .step-list li.active-step { border-color: var(--accent); background: var(--accent-bg); }
+    .step-list li:active { opacity: 0.75; }
+    .step-num { font-size: 0.72rem; font-weight: 600; color: var(--muted); min-width: 18px; text-align: right; }
+    .step-dur { margin-left: auto; font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    /* Settings */
+    .setting-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .setting-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .setting-select {
+      width: 100%; padding: 11px 14px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); font-family: var(--ff-sans); font-size: 0.9rem; cursor: pointer;
     }
 
-    button:hover { filter: brightness(0.98); }
-    button:active { transform: scale(0.975); }
-
-    .primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      border-color: color-mix(in srgb, var(--accent) 72%, black);
-      color: #04263f;
-      font-weight: 760;
+    /* Duration editor */
+    .dur-editor { display: flex; flex-direction: column; gap: 8px; }
+    .dur-row { display: grid; grid-template-columns: 1fr 80px; gap: 8px; align-items: center; }
+    .dur-label { font-size: 0.82rem; color: var(--text); }
+    .dur-input {
+      padding: 9px 10px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text); font-family: var(--ff-sans);
+      font-size: 0.88rem; text-align: center; font-variant-numeric: tabular-nums; width: 100%;
     }
 
-    .danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 42%, transparent); }
-    .button-icon { min-height: 42px; padding: 8px 12px; border-radius: 999px; font-size: var(--caption); }
+    /* History */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
+    .stat-val { font-family: var(--ff-serif); font-size: 2rem; font-weight: 600; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+    .stat-lbl { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+    .h-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .h-info { flex: 1; }
+    .h-name { font-size: 0.88rem; font-weight: 500; margin-bottom: 2px; }
+    .h-date { font-size: 0.72rem; color: var(--muted); }
+    .h-dur { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.88rem; }
+    .empty-icon { font-size: 2.2rem; margin-bottom: 10px; }
 
-    .panel-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+    /* Completion */
+    .completion-card { display: none; flex-direction: column; align-items: center; text-align: center; padding: 32px 20px; }
+    .completion-card.visible { display: flex; }
+    .completion-emoji { font-size: 3rem; margin-bottom: 14px; }
+    .completion-title { font-family: var(--ff-serif); font-size: 1.6rem; font-weight: 600; margin-bottom: 8px; }
+    .completion-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 22px; }
 
-    .collapsible {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(-2px);
-      transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
-    }
-    .collapsible.open { max-height: 1400px; opacity: 1; transform: translateY(0); margin-top: var(--space-3); }
+    /* Buttons */
+    .btn { width: 100%; padding: 15px; border-radius: 14px; border: none; font-family: var(--ff-sans); font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: transform 0.12s; letter-spacing: 0.01em; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 
-    .settings-grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-    .setting { display: grid; gap: 8px; color: var(--text-muted); font-weight: 630; }
+    /* Debug */
+    .debug-panel { display: none; font-size: 0.72rem; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; padding: 10px 12px; line-height: 1.8; }
+    .debug-panel.visible { display: block; }
 
-    .segmented {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
-      padding: 4px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-control);
-      background: var(--surface-secondary);
-    }
-
-    .segmented button { min-height: 44px; border-radius: 10px; border-color: transparent; }
-
-    .preview-list, .list, .editor-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
-    .list-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-control);
-      padding: var(--space-3);
-      display: grid;
-      gap: var(--space-2);
-      background: var(--surface-secondary);
-    }
-
-    .list-item.active { border-color: color-mix(in srgb, var(--accent) 58%, var(--border)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 44%, transparent); }
-    .step-name { font-weight: 650; }
-    .preview-drawer summary { cursor: pointer; font-weight: 640; }
-
-    .duration-row { display: grid; grid-template-columns: 1fr 90px; gap: var(--space-2); align-items: center; }
-    .duration-row input[type="number"] { min-height: 44px; padding: 8px; width: 100%; }
-
-    .completion {
-      display: none;
-      margin-top: var(--space-2);
-      text-align: center;
-      border: 1px solid color-mix(in srgb, var(--ok) 38%, var(--border));
-      border-radius: var(--radius-control);
-      padding: var(--space-3);
-      background: color-mix(in srgb, var(--ok) 10%, var(--surface));
-    }
-    .completion.visible { display: block; }
-
-    .debug-panel {
-      display: none;
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      background: color-mix(in srgb, var(--surface-secondary) 80%, transparent);
-      padding: 10px;
-      font-size: var(--caption);
-      color: var(--text-muted);
-    }
-    .debug-panel.visible { display: grid; gap: 6px; }
-
-    :focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 78%, white); outline-offset: 2px; }
-
-    @media (min-width: 860px) {
-      .bento-grid {
-        grid-template-columns: 1.3fr 1fr;
-        grid-template-areas:
-          "hero step"
-          "controls summary"
-          "panels panels";
-      }
-      .hero { grid-area: hero; }
-      .step-card { grid-area: step; }
-      .controls-card { grid-area: controls; }
-      .summary-card { grid-area: summary; }
-      .panel-card { grid-area: panels; }
-    }
-
-    @media (max-width: 760px) {
-      .app { gap: var(--space-2); padding-left: var(--space-2); padding-right: var(--space-2); }
-      .card { padding: var(--space-3); }
-      .hero { min-height: min(74dvh, 580px); }
-      .controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
+    details summary { cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--muted); padding: 2px 0; }
+    details[open] summary { margin-bottom: 10px; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .mt-8 { margin-top: 8px; }
+    .section-heading { font-family: var(--ff-serif); font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <main class="app">
-    <section id="updateBanner" class="update-banner" role="status" aria-live="polite">
-      <span>Update available.</span>
-      <button id="reloadBtn" type="button" class="primary" aria-label="Reload with latest version">Reload</button>
-    </section>
+<div class="app">
 
-    <section class="bento-grid">
-      <article class="card hero stack" aria-label="Main timer">
-        <div class="row">
-          <div>
-            <h1 id="headerTitle" class="app-title">Stretch Timer</h1>
-            <p class="status" id="status">Ready to start</p>
-          </div>
-          <div class="row">
-            <button id="debugToggleBtn" class="button-icon" type="button" aria-label="Toggle diagnostics">i</button>
-            <div class="pill" id="headerRemaining">--:-- left</div>
+  <div id="updateBanner" role="status" aria-live="polite">
+    <span>Update available</span>
+    <button id="reloadBtn" class="btn btn-primary" style="width:auto;padding:8px 14px;font-size:0.8rem;">Reload</button>
+  </div>
+
+  <header class="header">
+    <div class="wordmark">stretch<em>.</em></div>
+    <div class="header-right">
+      <span class="pill-remaining" id="headerRemaining">— left</span>
+      <button class="icon-btn" id="soundBtn" aria-label="Toggle sound">🔔</button>
+      <button class="icon-btn" id="debugBtn" aria-label="Diagnostics">i</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true"  onclick="showTab('timer')">Timer</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="showTab('routine')">Routine</button>
+    <button class="tab"        role="tab" aria-selected="false" onclick="showTab('settings')">Settings</button>
+  </nav>
+
+  <!-- ══ TIMER ══ -->
+  <div class="page active" id="timerPage" role="tabpanel">
+    <div id="activeTimer">
+      <div class="card timer-hero">
+        <div class="step-name-display" id="stepNameDisplay">Ready to stretch</div>
+        <div class="step-cue-display"  id="stepCueDisplay">Press ▶ to begin</div>
+
+        <div class="ring-wrap">
+          <svg viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="42"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-time"  id="ringTime">—:——</div>
+            <div class="ring-phase" id="ringPhase">ready</div>
           </div>
         </div>
 
-        <div class="timer-wrap">
-          <div id="timer" class="timer" aria-live="polite">00:00</div>
-          <p id="currentStep" class="current-step">Press Start to begin.</p>
-          <p class="step-cue" id="headerStep">Current stretch</p>
-        </div>
+        <div class="step-dots" id="stepDots"></div>
 
         <div class="progress-wrap">
-          <div class="progress-label">
-            <span id="stepProgressText">Step 1 of 1</span>
-            <span id="stepProgressPercent">0%</span>
+          <div class="progress-meta">
+            <span id="stepProgressText">Step — of —</span>
+            <span id="stepProgressPct">0%</span>
           </div>
-          <div class="progress-bar" aria-label="Progress through current routine">
-            <span id="progressFill"></span>
-          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         </div>
 
-        <button id="startPauseBtn" type="button" class="primary" aria-label="Start or pause timer">▶ Start</button>
-      </article>
-
-      <article class="card step-card stack">
-        <div class="caption">Current stretch</div>
-        <p id="stepTitle" class="current-step">Press Start to begin.</p>
-        <p id="modeCaption" class="caption">Mode: Long routine</p>
-      </article>
-
-      <article class="card controls-card stack">
-        <div class="caption">Controls</div>
-        <div class="controls-grid">
-          <button id="backBtn" type="button" aria-label="Previous stretch">⏮ Back</button>
-          <button id="nextBtn" type="button" aria-label="Next stretch">Next ⏭</button>
-          <button id="restartStepBtn" type="button" aria-label="Restart current stretch">↺ Restart</button>
-          <button id="resetBtn" type="button" class="danger" aria-label="Reset routine">Reset</button>
+        <div class="sec-controls">
+          <button class="sec-btn" aria-label="Previous" onclick="prevStep()">⏮</button>
+          <button class="play-btn" id="playBtn" aria-label="Play/pause" onclick="togglePlay()">▶</button>
+          <button class="sec-btn" aria-label="Skip" onclick="nextStep(false)">⏭</button>
         </div>
-      </article>
+      </div>
 
-      <article class="card summary-card stack">
-        <div class="caption">Routine summary</div>
-        <div class="pill" id="totals">Total remaining: --:--</div>
-        <div class="pill" id="routineDuration">Routine duration: --:--</div>
-        <details class="preview-drawer">
-          <summary>Upcoming (next 3)</summary>
-          <ul id="previewList" class="preview-list"></ul>
+      <div class="card">
+        <div class="card-title">Routine</div>
+        <div class="routine-segmented" id="timerSeg" role="radiogroup">
+          <button class="routine-seg-btn" data-key="quick" onclick="switchMode('quick')">Quick<br><span style="font-size:0.72rem;font-weight:400;opacity:0.7">~9 min</span></button>
+          <button class="routine-seg-btn active" data-key="long" onclick="switchMode('long')">Full<br><span style="font-size:0.72rem;font-weight:400;opacity:0.7">~17 min</span></button>
+        </div>
+        <details>
+          <summary>Upcoming stretches</summary>
+          <ul id="previewList" class="step-list mt-8"></ul>
         </details>
-      </article>
+      </div>
+    </div>
 
-      <article class="card panel-card stack">
-        <div class="panel-header">
-          <div class="caption">More</div>
-          <div class="row">
-            <button id="routineToggle" class="button-icon" type="button" aria-expanded="false" aria-controls="routinePanel">Routine</button>
-            <button id="settingsToggle" class="button-icon" type="button" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
-          </div>
-        </div>
+    <div class="card completion-card" id="completionCard">
+      <div class="completion-emoji">🎉</div>
+      <div class="completion-title">Session complete!</div>
+      <div class="completion-sub" id="completionSub">Great work.</div>
+      <button class="btn btn-primary" onclick="startAgain()">Start Again</button>
+    </div>
+  </div>
 
-        <section id="routinePanel" class="collapsible" aria-hidden="true">
-          <p class="caption" style="margin:0 0 8px;">View steps and jump to any step.</p>
-          <ul id="stepList" class="list"></ul>
-        </section>
+  <!-- ══ ROUTINE ══ -->
+  <div class="page" id="routinePage" role="tabpanel">
+    <div class="card">
+      <div class="routine-segmented" id="routineSeg" role="radiogroup">
+        <button class="routine-seg-btn" data-key="quick" onclick="switchMode('quick')">Quick (~9 min)</button>
+        <button class="routine-seg-btn active" data-key="long" onclick="switchMode('long')">Full (~17 min)</button>
+      </div>
+      <div class="section-heading" id="routineHeading">Full Routine</div>
+      <ul class="step-list" id="stepList"></ul>
+    </div>
+  </div>
 
-        <section id="settingsPanel" class="collapsible" aria-hidden="true">
-          <div class="settings-grid">
-            <div class="setting">
-              Routine
-              <div class="segmented" role="radiogroup" aria-label="Select routine length" id="routineSegmented">
-                <button type="button" data-routine-key="quick" role="radio" aria-checked="false">Quick</button>
-                <button type="button" data-routine-key="long" role="radio" aria-checked="true">Long</button>
-              </div>
-            </div>
-            <label class="setting" for="themeSelect">
-              Theme
-              <select id="themeSelect" aria-label="Theme" class="setting-select">
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </label>
-            <div class="setting">
-              Version
-              <div id="versionLabel" class="pill">--</div>
-            </div>
-          </div>
-          <div class="setting" style="margin-top:12px;">
-            Edit durations (seconds)
-            <ul id="durationEditor" class="editor-list"></ul>
-            <button id="resetDurationsBtn" type="button">Reset durations to defaults</button>
-          </div>
-        </section>
+  <!-- ══ SETTINGS ══ -->
+  <div class="page" id="settingsPage" role="tabpanel">
+    <div class="card">
+      <div class="card-title">Appearance</div>
+      <div class="setting-row">
+        <label class="setting-label" for="themeSelect">Theme</label>
+        <select class="setting-select" id="themeSelect">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Edit Durations (seconds)</div>
+      <div class="routine-segmented" id="settingsSeg" role="radiogroup">
+        <button class="routine-seg-btn" data-key="quick" onclick="switchMode('quick')">Quick</button>
+        <button class="routine-seg-btn active" data-key="long" onclick="switchMode('long')">Full</button>
+      </div>
+      <div class="dur-editor" id="durEditor"></div>
+      <button class="btn btn-secondary mt-8" onclick="resetDurations()" style="margin-top:12px;">Reset to defaults</button>
+    </div>
+    <div class="card">
+      <div class="card-title">History</div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="history-list mt-8" id="historyList"></div>
+    </div>
+    <div class="card" style="font-size:0.78rem;color:var(--muted);line-height:1.8;">
+      Version: <span id="versionLabel">—</span>
+    </div>
+    <div class="debug-panel" id="debugPanel"></div>
+  </div>
 
-        <section id="debugPanel" class="debug-panel" aria-live="polite"></section>
+</div>
 
-        <div id="completionCard" class="completion" aria-live="polite">
-          <h2>Routine complete 🎉</h2>
-          <p id="completionSummary"></p>
-          <button id="startAgainBtn" type="button" class="primary">Start again</button>
-        </div>
-      </article>
-    </section>
-  </main>
+<script>
+const APP_VERSION = 'v2.0-2026.02.20';
+const STORAGE_KEY = 'stretch-timer-settings-vnext';
+const HISTORY_KEY = 'stretch-timer-history';
+const RING_CIRC   = 263.89;
+const REST_SECS   = 12;
 
-  <script>
-    const APP_VERSION = 'vNext-2026.02.17';
-    const STORAGE_KEY = 'stretch-timer-settings-vnext';
+const BASE = {
+  long: [
+    { label: 'Left Half-Kneeling Hip Flexor',  seconds: 75 },
+    { label: 'Right Half-Kneeling Hip Flexor', seconds: 75 },
+    { label: 'Left Couch Stretch',             seconds: 75 },
+    { label: 'Right Couch Stretch',            seconds: 75 },
+    { label: 'Left Pigeon Pose',               seconds: 75 },
+    { label: 'Right Pigeon Pose',              seconds: 75 },
+    { label: 'Left Hamstring Stretch',         seconds: 75 },
+    { label: 'Right Hamstring Stretch',        seconds: 75 },
+    { label: 'Adductor Rock-Back',             seconds: 60 },
+    { label: 'Calf Stretch (Wall)',            seconds: 60 },
+    { label: 'Thoracic Opener (Open Book)',    seconds: 60 },
+    { label: "Child's Pose",                   seconds: 60 },
+    { label: 'Supine Spinal Twist (Left)',     seconds: 60 },
+    { label: 'Supine Spinal Twist (Right)',    seconds: 60 },
+  ],
+  quick: [
+    { label: 'Left Half-Kneeling Hip Flexor',  seconds: 60 },
+    { label: 'Right Half-Kneeling Hip Flexor', seconds: 60 },
+    { label: 'Left Pigeon Pose',               seconds: 60 },
+    { label: 'Right Pigeon Pose',              seconds: 60 },
+    { label: 'Left Hamstring Stretch',         seconds: 60 },
+    { label: 'Right Hamstring Stretch',        seconds: 60 },
+    { label: 'Chest Opener (Doorway)',         seconds: 60 },
+    { label: 'Thoracic Opener (Open Book)',    seconds: 60 },
+    { label: "Child's Pose",                   seconds: 60 },
+  ]
+};
 
-    const BASE_ROUTINES = {
-      long: [
-        { label: 'Left Half-Kneeling Hip Flexor', seconds: 75 },
-        { label: 'Right Half-Kneeling Hip Flexor', seconds: 75 },
-        { label: 'Left Couch Stretch', seconds: 75 },
-        { label: 'Right Couch Stretch', seconds: 75 },
-        { label: 'Left Pigeon Pose', seconds: 75 },
-        { label: 'Right Pigeon Pose', seconds: 75 },
-        { label: 'Left Hamstring Stretch', seconds: 75 },
-        { label: 'Right Hamstring Stretch', seconds: 75 },
-        { label: 'Adductor Rock-Back', seconds: 60 },
-        { label: 'Calf Stretch (Wall)', seconds: 60 },
-        { label: 'Thoracic Opener (Open Book)', seconds: 60 },
-        { label: 'Child’s Pose', seconds: 60 },
-        { label: 'Supine Spinal Twist (Left)', seconds: 60 },
-        { label: 'Supine Spinal Twist (Right)', seconds: 60 }
-      ],
-      quick: [
-        { label: 'Left Half-Kneeling Hip Flexor', seconds: 60 },
-        { label: 'Right Half-Kneeling Hip Flexor', seconds: 60 },
-        { label: 'Left Pigeon Pose', seconds: 60 },
-        { label: 'Right Pigeon Pose', seconds: 60 },
-        { label: 'Left Hamstring Stretch', seconds: 60 },
-        { label: 'Right Hamstring Stretch', seconds: 60 },
-        { label: 'Chest Opener (Doorway)', seconds: 60 },
-        { label: 'Thoracic Opener (Open Book)', seconds: 60 },
-        { label: 'Child’s Pose', seconds: 60 }
-      ]
-    };
+const S = {
+  key: 'long', routines: structuredClone(BASE), durations: {long:[],quick:[]},
+  idx: 0, remaining: 0, total: 0,
+  running: false, resting: false, ticker: null, endsAt: 0,
+  done: false, theme: 'system', sound: true, sessionStart: null,
+  sw: false, dbg: false,
+};
 
-    const els = {
-      timer: document.getElementById('timer'),
-      currentStep: document.getElementById('currentStep'),
-      stepTitle: document.getElementById('stepTitle'),
-      totals: document.getElementById('totals'),
-      routineDuration: document.getElementById('routineDuration'),
-      status: document.getElementById('status'),
-      progressFill: document.getElementById('progressFill'),
-      stepProgressText: document.getElementById('stepProgressText'),
-      stepProgressPercent: document.getElementById('stepProgressPercent'),
-      headerStep: document.getElementById('headerStep'),
-      headerRemaining: document.getElementById('headerRemaining'),
-      modeCaption: document.getElementById('modeCaption'),
-      stepList: document.getElementById('stepList'),
-      previewList: document.getElementById('previewList'),
-      completionCard: document.getElementById('completionCard'),
-      completionSummary: document.getElementById('completionSummary'),
-      routineToggle: document.getElementById('routineToggle'),
-      settingsToggle: document.getElementById('settingsToggle'),
-      routinePanel: document.getElementById('routinePanel'),
-      settingsPanel: document.getElementById('settingsPanel'),
-      routineButtons: Array.from(document.querySelectorAll('[data-routine-key]')),
-      startPauseBtn: document.getElementById('startPauseBtn'),
-      nextBtn: document.getElementById('nextBtn'),
-      backBtn: document.getElementById('backBtn'),
-      resetBtn: document.getElementById('resetBtn'),
-      restartStepBtn: document.getElementById('restartStepBtn'),
-      startAgainBtn: document.getElementById('startAgainBtn'),
-      themeSelect: document.getElementById('themeSelect'),
-      durationEditor: document.getElementById('durationEditor'),
-      resetDurationsBtn: document.getElementById('resetDurationsBtn'),
-      updateBanner: document.getElementById('updateBanner'),
-      reloadBtn: document.getElementById('reloadBtn'),
-      debugPanel: document.getElementById('debugPanel'),
-      debugToggleBtn: document.getElementById('debugToggleBtn'),
-      headerTitle: document.getElementById('headerTitle'),
-      versionLabel: document.getElementById('versionLabel')
-    };
+// ── Audio ──
+let audioCtx = null;
+const getCtx = () => audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+function tone(freq, dur, vol=0.22, type='sine') {
+  if (!S.sound) return;
+  try {
+    const ctx=getCtx(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.start(); o.stop(ctx.currentTime+dur);
+  } catch(e){}
+}
+const chimeStart = () => { tone(523,.25); setTimeout(()=>tone(659,.25),100); setTimeout(()=>tone(784,.4),200); };
+const chimeRest  = () => tone(440,.4,'triangle',.18);
+const chimeDone  = () => { tone(523,.2); setTimeout(()=>tone(659,.2),90); setTimeout(()=>tone(784,.2),180); setTimeout(()=>tone(1047,.55),270); };
+const chimeBeep  = () => tone(880,.12,'square',.08);
 
-    const state = {
-      activeRoutineKey: 'long',
-      stepIndex: 0,
-      remaining: 0,
-      isRunning: false,
-      theme: 'system',
-      ticker: null,
-      endsAt: 0,
-      completed: false,
-      completionSeconds: 0,
-      routines: structuredClone(BASE_ROUTINES),
-      durations: { quick: [], long: [] },
-      swRegistered: false,
-      debugOpen: false
-    };
+// ── Helpers ──
+const cur  = () => S.routines[S.key];
+const step = () => cur()[S.idx];
+const fmt  = s => { s=Math.max(0,Math.floor(s)); return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; };
+const remTotal = () => cur().slice(S.idx+1).reduce((a,s)=>a+s.seconds,0)+S.remaining;
+const $  = id => document.getElementById(id);
 
-    function formatClock(totalSeconds) {
-      const s = Math.max(0, Math.floor(totalSeconds));
-      const min = Math.floor(s / 60).toString().padStart(2, '0');
-      const sec = (s % 60).toString().padStart(2, '0');
-      return `${min}:${sec}`;
-    }
+// ── Persist ──
+function applyDurs(ov) {
+  ['long','quick'].forEach(k => {
+    const b=BASE[k], src=Array.isArray(ov?.[k])?ov[k]:[];
+    S.durations[k]=b.map((s,i)=>{ const v=Number(src[i]); return Number.isFinite(v)?Math.min(600,Math.max(15,Math.round(v))):s.seconds; });
+    S.routines[k]=b.map((s,i)=>({...s,seconds:S.durations[k][i]}));
+  });
+}
+function loadSettings() {
+  applyDurs(null);
+  try {
+    const p=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    if(['system','light','dark'].includes(p.theme)) S.theme=p.theme;
+    if(['long','quick'].includes(p.key))            S.key=p.key;
+    if(typeof p.sound==='boolean')                  S.sound=p.sound;
+    applyDurs(p.durations);
+  } catch(e){}
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({theme:S.theme,key:S.key,sound:S.sound,durations:S.durations}));
+}
+function saveHistory(name,mins,stretches) {
+  try {
+    const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    h.unshift({routine:name,date:new Date().toISOString(),mins,stretches});
+    localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(0,60)));
+  } catch(e){}
+}
 
-    function currentRoutine() { return state.routines[state.activeRoutineKey]; }
-    function currentStep() { return currentRoutine()[state.stepIndex]; }
-    function routineTotalSeconds() { return currentRoutine().reduce((sum, step) => sum + step.seconds, 0); }
+// ── Tabs ──
+function showTab(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
+  $(`${name}Page`).classList.add('active');
+  const tabs=['timer','routine','settings'];
+  const t=document.querySelectorAll('.tab')[tabs.indexOf(name)];
+  if(t){t.classList.add('active');t.setAttribute('aria-selected','true');}
+  if(name==='routine')  buildStepList();
+  if(name==='settings') { buildDurEditor(); renderHistory(); }
+}
 
-    function remainingTotalSeconds() {
-      const routine = currentRoutine();
-      return routine.slice(state.stepIndex + 1).reduce((sum, step) => sum + step.seconds, 0) + state.remaining;
-    }
+// ── Theme ──
+function applyTheme() {
+  const r=document.documentElement;
+  if(S.theme==='system') r.removeAttribute('data-theme');
+  else r.setAttribute('data-theme',S.theme);
+}
 
-    function persistSettings() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        theme: state.theme,
-        activeRoutineKey: state.activeRoutineKey,
-        durations: state.durations
-      }));
-    }
+// ── Sync all segmented controls ──
+function syncAll() {
+  ['timerSeg','routineSeg','settingsSeg'].forEach(id=>{
+    const w=$(id); if(!w) return;
+    w.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('active',b.dataset.key===S.key));
+  });
+  const ts=$('themeSelect'); if(ts) ts.value=S.theme;
+  $('soundBtn').textContent=S.sound?'🔔':'🔕';
+  $('versionLabel').textContent=APP_VERSION;
+}
 
-    function applyDurationOverrides(overrides) {
-      ['quick', 'long'].forEach((key) => {
-        const list = BASE_ROUTINES[key];
-        const provided = Array.isArray(overrides?.[key]) ? overrides[key] : [];
-        state.durations[key] = list.map((step, idx) => {
-          const value = Number(provided[idx]);
-          return Number.isFinite(value) ? Math.min(600, Math.max(15, Math.round(value))) : step.seconds;
-        });
-        state.routines[key] = list.map((step, idx) => ({ ...step, seconds: state.durations[key][idx] }));
-      });
-    }
+// ── Render ──
+function render() {
+  const r=cur(), s=step();
+  const elapsed=S.total-S.remaining;
+  const frac=S.total?elapsed/S.total:0;
+  const pct=Math.round(((S.idx+Math.min(1,Math.max(0,frac)))/r.length)*100);
 
-    function loadSettings() {
-      applyDurationOverrides(null);
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (parsed.theme === 'system' || parsed.theme === 'light' || parsed.theme === 'dark') state.theme = parsed.theme;
-        if (parsed.activeRoutineKey === 'quick' || parsed.activeRoutineKey === 'long') state.activeRoutineKey = parsed.activeRoutineKey;
-        applyDurationOverrides(parsed.durations);
-      } catch (_) {}
-    }
+  // Ring
+  const off=RING_CIRC*(1-Math.min(1,Math.max(0,S.remaining/S.total)));
+  $('ringFg').style.strokeDashoffset=off;
+  $('ringFg').classList.toggle('rest-color',S.resting);
+  $('ringTime').textContent=fmt(S.remaining);
+  $('ringPhase').textContent=S.done?'done':S.resting?'rest':'stretch';
 
-    function stopTicker() {
-      if (state.ticker) clearInterval(state.ticker);
-      state.ticker = null;
-      state.isRunning = false;
-    }
+  // Labels
+  if(!S.done){
+    $('stepNameDisplay').textContent=S.resting?'Rest':s.label;
+    $('stepCueDisplay').textContent=S.resting?`Next: ${r[S.idx+1]?.label||'last one!'}`:`Step ${S.idx+1} of ${r.length}`;
+  }
 
-    function applyTheme() {
-      if (state.theme === 'system') return document.documentElement.removeAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', state.theme);
-    }
+  // Play btn
+  const pb=$('playBtn');
+  pb.textContent=S.running?'⏸':'▶';
+  pb.classList.toggle('rest-mode',S.resting);
 
-    function setPanelOpen(panel, trigger, isOpen) {
-      panel.classList.toggle('open', isOpen);
-      panel.setAttribute('aria-hidden', String(!isOpen));
-      trigger.setAttribute('aria-expanded', String(isOpen));
-    }
+  // Progress
+  $('progressFill').style.width=`${pct}%`;
+  $('stepProgressText').textContent=`Step ${S.idx+1} of ${r.length}`;
+  $('stepProgressPct').textContent=`${pct}%`;
+  $('headerRemaining').textContent=`${fmt(remTotal())} left`;
 
-    function iconSvg() {
-      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l3 6 3 1 2 6"></path><path d="M8 19h8"></path></svg>';
-    }
+  // Dots
+  buildDots();
+  buildPreview();
 
-    function stepWithIconHtml(label, prefix = '') {
-      return `<span style="display:inline-flex;align-items:center;gap:8px;"><span aria-hidden="true" style="width:1.1em;height:1.1em;color:var(--accent-strong);display:inline-block;">${iconSvg()}</span><span>${prefix}${label}</span></span>`;
-    }
+  // Completion
+  $('completionCard').classList.toggle('visible',S.done);
+  $('activeTimer').style.display=S.done?'none':'';
 
-    function buildStepList() {
-      const routine = currentRoutine();
-      els.stepList.innerHTML = '';
-      routine.forEach((step, index) => {
-        const li = document.createElement('li');
-        li.className = `list-item${index === state.stepIndex ? ' active' : ''}`;
-        const name = document.createElement('div');
-        name.className = 'step-name';
-        name.innerHTML = stepWithIconHtml(step.label, `${index + 1}. `);
-        const jump = document.createElement('button');
-        jump.type = 'button';
-        jump.textContent = 'Jump to step';
-        jump.addEventListener('click', () => {
-          state.stepIndex = index;
-          state.remaining = currentStep().seconds;
-          state.completed = false;
-          render();
-          if (state.isRunning) startTicker();
-        });
-        const duration = document.createElement('div');
-        duration.className = 'caption';
-        duration.textContent = formatClock(step.seconds);
-        li.append(name, jump, duration);
-        els.stepList.appendChild(li);
-      });
-    }
+  applyTheme();
+  syncAll();
+  if(S.dbg) renderDebug();
+}
 
-    function buildPreview() {
-      const routine = currentRoutine();
-      const upcoming = routine.slice(state.stepIndex + 1, state.stepIndex + 4);
-      els.previewList.innerHTML = '';
-      if (!upcoming.length) {
-        const li = document.createElement('li');
-        li.className = 'caption';
-        li.textContent = 'No upcoming steps.';
-        els.previewList.appendChild(li);
-        return;
-      }
-      upcoming.forEach((step) => {
-        const li = document.createElement('li');
-        li.className = 'list-item';
-        li.textContent = `${step.label} · ${formatClock(step.seconds)}`;
-        els.previewList.appendChild(li);
-      });
-    }
+function buildDots() {
+  const r=cur(), c=$('stepDots');
+  c.innerHTML='';
+  r.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i<S.idx?' done':i===S.idx&&S.resting?' rest-active':i===S.idx?' active':'');
+    d.title=r[i].label;
+    d.addEventListener('click',()=>jumpTo(i));
+    c.appendChild(d);
+  });
+}
 
-    function buildDurationEditor() {
-      els.durationEditor.innerHTML = '';
-      currentRoutine().forEach((step, index) => {
-        const li = document.createElement('li');
-        li.className = 'duration-row';
-        const label = document.createElement('label');
-        label.textContent = step.label;
-        label.setAttribute('for', `duration-${index}`);
+function buildPreview() {
+  const up=cur().slice(S.idx+1,S.idx+4), pl=$('previewList');
+  pl.innerHTML='';
+  if(!up.length){
+    const li=document.createElement('li');
+    li.style.cssText='color:var(--muted);font-size:0.8rem;padding:8px 0;list-style:none;';
+    li.textContent='No upcoming stretches'; pl.appendChild(li); return;
+  }
+  up.forEach((s,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="step-num">${S.idx+2+i}</span><span>${s.label}</span><span class="step-dur">${fmt(s.seconds)}</span>`;
+    pl.appendChild(li);
+  });
+}
 
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.id = `duration-${index}`;
-        input.min = '15';
-        input.max = '600';
-        input.step = '5';
-        input.value = String(step.seconds);
-        input.setAttribute('aria-label', `${step.label} duration in seconds`);
-        input.addEventListener('change', () => {
-          const safe = Math.min(600, Math.max(15, Math.round(Number(input.value) || step.seconds)));
-          state.durations[state.activeRoutineKey][index] = safe;
-          state.routines[state.activeRoutineKey][index].seconds = safe;
-          if (state.stepIndex === index) state.remaining = Math.min(state.remaining, safe) || safe;
-          input.value = String(safe);
-          state.completed = false;
-          persistSettings();
-          render();
-          if (state.isRunning) startTicker();
-        });
+function buildStepList() {
+  const r=cur(), sl=$('stepList');
+  sl.innerHTML='';
+  $('routineHeading').textContent=S.key==='long'?'Full Routine':'Quick Routine';
+  r.forEach((s,i)=>{
+    const li=document.createElement('li');
+    li.className=i===S.idx?'active-step':'';
+    li.innerHTML=`<span class="step-num">${i+1}</span><span>${s.label}</span><span class="step-dur">${fmt(s.seconds)}</span>`;
+    li.addEventListener('click',()=>jumpTo(i));
+    sl.appendChild(li);
+  });
+}
 
-        li.append(label, input);
-        els.durationEditor.appendChild(li);
-      });
-    }
-
-    function renderCompletion() {
-      els.completionCard.classList.toggle('visible', state.completed);
-      if (state.completed) els.completionSummary.textContent = `Great work! Total time stretched: ${formatClock(state.completionSeconds)}.`;
-    }
-
-    function updateDebugPanel() {
-      if (!state.debugOpen) return;
-      const lines = [
-        `mode: ${state.activeRoutineKey}`,
-        `theme: ${state.theme}`,
-        `sw registered: ${state.swRegistered ? 'yes' : 'no'}`,
-        `cache version: stretch-timer-vnext-2026-02-17`,
-        `app version: ${APP_VERSION}`
-      ];
-      els.debugPanel.innerHTML = lines.map((line) => `<div>${line}</div>`).join('');
-    }
-
-    function render() {
-      const routine = currentRoutine();
-      const step = currentStep();
-      const stepElapsed = step.seconds - state.remaining;
-      const stepFraction = step.seconds ? stepElapsed / step.seconds : 0;
-      const routineProgress = ((state.stepIndex + Math.max(0, Math.min(1, stepFraction))) / routine.length) * 100;
-      const safeProgress = Math.max(0, Math.min(100, routineProgress));
-
-      els.timer.textContent = formatClock(state.remaining);
-      els.timer.classList.toggle('pulse', state.isRunning);
-      els.currentStep.innerHTML = stepWithIconHtml(step.label);
-      els.stepTitle.innerHTML = stepWithIconHtml(step.label);
-      els.headerStep.textContent = state.isRunning ? 'Keep breathing and stay tall.' : 'Ready when you are.';
-      els.headerRemaining.textContent = `${formatClock(remainingTotalSeconds())} left`;
-      els.totals.textContent = `Total remaining: ${formatClock(remainingTotalSeconds())}`;
-      els.routineDuration.textContent = `Routine duration: ${formatClock(routineTotalSeconds())}`;
-      els.progressFill.style.width = `${safeProgress}%`;
-      els.stepProgressText.textContent = `Step ${state.stepIndex + 1} of ${routine.length}`;
-      els.stepProgressPercent.textContent = `${Math.round(safeProgress)}%`;
-      els.status.textContent = state.completed ? 'Routine complete' : state.isRunning ? 'Running' : 'Paused';
-      els.modeCaption.textContent = `Mode: ${state.activeRoutineKey === 'quick' ? 'Quick routine' : 'Long routine'}`;
-      els.startPauseBtn.textContent = state.isRunning ? '⏸ Pause' : '▶ Start';
-      els.themeSelect.value = state.theme;
-      els.versionLabel.textContent = APP_VERSION;
-
-      els.routineButtons.forEach((button) => {
-        const isActive = button.dataset.routineKey === state.activeRoutineKey;
-        button.classList.toggle('primary', isActive);
-        button.setAttribute('aria-pressed', String(isActive));
-        button.setAttribute('aria-checked', String(isActive));
-        button.tabIndex = isActive ? 0 : -1;
-      });
-
-      buildStepList();
-      buildPreview();
-      buildDurationEditor();
-      renderCompletion();
-      applyTheme();
-      updateDebugPanel();
-    }
-
-    function showCompletion() {
-      stopTicker();
-      state.completed = true;
-      state.completionSeconds = routineTotalSeconds();
-      state.remaining = 0;
-      render();
-    }
-
-    function nextStep(fromAuto = false) {
-      const routine = currentRoutine();
-      if (state.stepIndex < routine.length - 1) {
-        state.stepIndex += 1;
-        state.remaining = currentStep().seconds;
-        state.completed = false;
-        render();
-        if (state.isRunning || fromAuto) startTicker();
-      } else {
-        showCompletion();
-      }
-    }
-
-    function previousStep() {
-      if (state.stepIndex > 0) {
-        state.stepIndex -= 1;
-        state.remaining = currentStep().seconds;
-        state.completed = false;
-        render();
-        if (state.isRunning) startTicker();
-      }
-    }
-
-    function startTicker() {
-      state.completed = false;
-      stopTicker();
-      state.isRunning = true;
-      state.endsAt = Date.now() + state.remaining * 1000;
-
-      state.ticker = setInterval(() => {
-        const secondsLeft = Math.max(0, Math.ceil((state.endsAt - Date.now()) / 1000));
-        state.remaining = secondsLeft;
-        render();
-        if (secondsLeft <= 0) nextStep(true);
-      }, 220);
-    }
-
-    function resetRoutine() {
-      stopTicker();
-      state.stepIndex = 0;
-      state.remaining = currentStep().seconds;
-      state.completed = false;
-      render();
-    }
-
-    function switchMode(mode) {
-      if (mode !== 'quick' && mode !== 'long') return;
-      if (state.activeRoutineKey === mode) return;
-      state.activeRoutineKey = mode;
-      stopTicker();
-      state.stepIndex = 0;
-      state.remaining = currentStep().seconds;
-      state.completed = false;
-      persistSettings();
-      render();
-    }
-
-    function setupSegmentedKeyboard() {
-      const seg = document.getElementById('routineSegmented');
-      seg.addEventListener('keydown', (event) => {
-        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
-        event.preventDefault();
-        const order = ['quick', 'long'];
-        const currentIdx = order.indexOf(state.activeRoutineKey);
-        const dir = (event.key === 'ArrowRight' || event.key === 'ArrowDown') ? 1 : -1;
-        const nextMode = order[(currentIdx + dir + order.length) % order.length];
-        switchMode(nextMode);
-        const target = els.routineButtons.find((b) => b.dataset.routineKey === nextMode);
-        if (target) target.focus();
-      });
-    }
-
-    function showUpdateBanner(registration) {
-      if (!registration?.waiting) return;
-      els.updateBanner.classList.add('visible');
-      els.reloadBtn.onclick = () => {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      };
-    }
-
-    function setupServiceWorker() {
-      if (!('serviceWorker' in navigator)) return;
-      if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') return;
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('./sw.js');
-          state.swRegistered = true;
-          updateDebugPanel();
-
-          if (registration.waiting) showUpdateBanner(registration);
-
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (!newWorker) return;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateBanner(registration);
-              }
-            });
-          });
-
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            window.location.reload();
-          });
-        } catch (_) {
-          state.swRegistered = false;
-          updateDebugPanel();
-        }
-      });
-    }
-
-    els.startPauseBtn.addEventListener('click', () => {
-      if (state.isRunning) {
-        stopTicker();
-        render();
-      } else {
-        startTicker();
-      }
+function buildDurEditor() {
+  const r=cur(), de=$('durEditor');
+  de.innerHTML='';
+  r.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='dur-row';
+    const lbl=document.createElement('label'); lbl.className='dur-label'; lbl.textContent=s.label; lbl.htmlFor=`d${i}`;
+    const inp=document.createElement('input');
+    inp.type='number'; inp.min=15; inp.max=600; inp.step=5;
+    inp.id=`d${i}`; inp.className='dur-input'; inp.value=s.seconds;
+    inp.addEventListener('change',()=>{
+      const v=Math.min(600,Math.max(15,Math.round(Number(inp.value)||s.seconds)));
+      inp.value=v;
+      S.durations[S.key][i]=v; S.routines[S.key][i].seconds=v;
+      if(S.idx===i&&!S.resting){ S.remaining=Math.min(S.remaining,v); S.total=v; }
+      S.done=false; save(); render();
     });
+    row.append(lbl,inp); de.appendChild(row);
+  });
+}
 
-    els.nextBtn.addEventListener('click', () => nextStep(false));
-    els.backBtn.addEventListener('click', previousStep);
-    els.resetBtn.addEventListener('click', resetRoutine);
-    els.restartStepBtn.addEventListener('click', () => {
-      state.remaining = currentStep().seconds;
-      state.completed = false;
-      render();
-      if (state.isRunning) startTicker();
+function renderHistory() {
+  try {
+    const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    const sg=$('statsGrid');
+    const sessions=h.length, mins=h.reduce((a,b)=>a+b.mins,0), stretches=h.reduce((a,b)=>a+b.stretches,0);
+    const streak=calcStreak(h);
+    sg.innerHTML=`
+      <div class="stat-card"><div class="stat-val">${sessions}</div><div class="stat-lbl">sessions</div></div>
+      <div class="stat-card"><div class="stat-val">${streak}🔥</div><div class="stat-lbl">day streak</div></div>
+      <div class="stat-card"><div class="stat-val">${mins}</div><div class="stat-lbl">total mins</div></div>
+      <div class="stat-card"><div class="stat-val">${stretches}</div><div class="stat-lbl">stretches</div></div>
+    `;
+    const hl=$('historyList');
+    hl.innerHTML='';
+    if(!h.length){
+      hl.innerHTML='<div class="empty-state"><div class="empty-icon">🧘</div>Complete a session to see history</div>';
+      return;
+    }
+    h.slice(0,10).forEach(s=>{
+      const d=document.createElement('div'); d.className='history-item';
+      d.innerHTML=`<div class="h-dot"></div><div class="h-info"><div class="h-name">${s.routine}</div><div class="h-date">${fmtDate(s.date)}</div></div><div class="h-dur">${s.mins} min</div>`;
+      hl.appendChild(d);
     });
+  } catch(e){}
+}
 
-    els.startAgainBtn.addEventListener('click', () => {
-      state.stepIndex = 0;
-      state.remaining = currentStep().seconds;
-      state.completed = false;
-      render();
-    });
+function calcStreak(h) {
+  if(!h.length) return 0;
+  const days=[...new Set(h.map(s=>s.date.slice(0,10)))].sort().reverse();
+  let streak=0, check=new Date(); check.setHours(0,0,0,0);
+  for(const d of days){
+    const dd=new Date(d), diff=Math.round((check-dd)/86400000);
+    if(diff<=1){streak++;check=dd;} else break;
+  }
+  return streak;
+}
 
-    els.routineToggle.addEventListener('click', () => setPanelOpen(els.routinePanel, els.routineToggle, !els.routinePanel.classList.contains('open')));
-    els.settingsToggle.addEventListener('click', () => setPanelOpen(els.settingsPanel, els.settingsToggle, !els.settingsPanel.classList.contains('open')));
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
 
-    els.themeSelect.addEventListener('change', () => {
-      state.theme = els.themeSelect.value;
-      persistSettings();
-      applyTheme();
-      render();
-    });
+function renderDebug() {
+  $('debugPanel').innerHTML=`mode:${S.key} | theme:${S.theme} | sound:${S.sound} | sw:${S.sw}<br>step:${S.idx} | rem:${S.remaining}s | rest:${S.resting} | ver:${APP_VERSION}`;
+}
 
-    els.routineButtons.forEach((button) => button.addEventListener('click', () => switchMode(button.dataset.routineKey)));
+// ── Timer logic ──
+function stopTicker() { clearInterval(S.ticker); S.ticker=null; S.running=false; }
 
-    els.resetDurationsBtn.addEventListener('click', () => {
-      applyDurationOverrides(null);
-      state.stepIndex = 0;
-      state.remaining = currentStep().seconds;
-      state.completed = false;
-      persistSettings();
-      render();
-    });
+function startTicker() {
+  stopTicker(); S.running=true;
+  S.endsAt=Date.now()+S.remaining*1000;
+  S.ticker=setInterval(()=>{
+    const left=Math.max(0,Math.ceil((S.endsAt-Date.now())/1000));
+    if(left<=3&&left>0) chimeBeep();
+    S.remaining=left; render();
+    if(left<=0){ clearInterval(S.ticker); S.ticker=null; onEnd(); }
+  },250);
+}
 
-    els.debugToggleBtn.addEventListener('click', () => {
-      state.debugOpen = !state.debugOpen;
-      els.debugPanel.classList.toggle('visible', state.debugOpen);
-      updateDebugPanel();
-    });
+function onEnd() {
+  if(S.resting){
+    chimeStart(); loadStep(S.idx+1); startTicker();
+  } else {
+    const d=$('stepDots').children[S.idx];
+    if(d) d.className='dot done';
+    if(S.idx<cur().length-1){ chimeRest(); loadRest(); startTicker(); }
+    else { chimeDone(); finish(); }
+  }
+}
 
-    let longPressTimer = null;
-    els.headerTitle.addEventListener('pointerdown', () => {
-      longPressTimer = setTimeout(() => {
-        state.debugOpen = !state.debugOpen;
-        els.debugPanel.classList.toggle('visible', state.debugOpen);
-        updateDebugPanel();
-      }, 700);
-    });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((evt) => {
-      els.headerTitle.addEventListener(evt, () => {
-        if (longPressTimer) clearTimeout(longPressTimer);
-      });
-    });
+function loadStep(i) {
+  S.idx=i; S.resting=false; S.done=false;
+  const s=step(); S.remaining=s.seconds; S.total=s.seconds; render();
+}
+function loadRest() {
+  S.resting=true; S.remaining=REST_SECS; S.total=REST_SECS; render();
+}
+function finish() {
+  stopTicker(); S.done=true;
+  const mins=Math.max(1,Math.round((Date.now()-(S.sessionStart||Date.now()))/60000));
+  $('completionSub').textContent=`You completed ${cur().length} stretches in ~${mins} minute${mins!==1?'s':''}.`;
+  saveHistory(S.key==='long'?'Full Routine':'Quick Routine',mins,cur().length);
+  render();
+}
 
-    loadSettings();
-    setupSegmentedKeyboard();
-    setupServiceWorker();
-    state.remaining = currentStep().seconds;
-    setPanelOpen(els.routinePanel, els.routineToggle, false);
-    setPanelOpen(els.settingsPanel, els.settingsToggle, false);
-    render();
-  </script>
+function togglePlay() {
+  if(S.done) return;
+  if(S.running){ stopTicker(); render(); }
+  else {
+    if(!S.sessionStart) S.sessionStart=Date.now();
+    getCtx();
+    if(S.remaining===S.total&&!S.resting) chimeStart();
+    startTicker();
+  }
+}
+function nextStep(auto=true) {
+  if(S.done) return; stopTicker();
+  if(!S.resting&&S.idx<cur().length-1){ loadRest(); }
+  else if(S.resting&&S.idx<cur().length-1){ loadStep(S.idx+1); }
+  else { finish(); return; }
+  if(S.running||auto) startTicker();
+}
+function prevStep() {
+  stopTicker();
+  if(S.resting){ loadStep(S.idx); } else if(S.idx>0){ loadStep(S.idx-1); }
+  if(S.running) startTicker();
+}
+function jumpTo(i) {
+  stopTicker(); loadStep(i); S.done=false; render(); showTab('timer');
+}
+function startAgain() {
+  stopTicker(); S.idx=0; S.resting=false; S.done=false; S.sessionStart=null;
+  const s=step(); S.remaining=s.seconds; S.total=s.seconds; render();
+}
+function switchMode(key) {
+  if(!['long','quick'].includes(key)||key===S.key) return;
+  stopTicker(); S.key=key; S.idx=0; S.resting=false; S.done=false; S.sessionStart=null;
+  const s=step(); S.remaining=s.seconds; S.total=s.seconds;
+  save(); render(); buildDurEditor(); buildStepList();
+}
+function resetDurations() {
+  applyDurs(null); S.idx=0; S.resting=false; S.done=false;
+  const s=step(); S.remaining=s.seconds; S.total=s.seconds;
+  save(); render(); buildDurEditor();
+}
+
+// ── Events ──
+$('soundBtn').addEventListener('click',()=>{ S.sound=!S.sound; save(); render(); });
+$('themeSelect').addEventListener('change',()=>{ S.theme=$('themeSelect').value; save(); applyTheme(); render(); });
+$('debugBtn').addEventListener('click',()=>{ S.dbg=!S.dbg; $('debugPanel').classList.toggle('visible',S.dbg); if(S.dbg) renderDebug(); });
+
+let lp=null;
+document.querySelector('.wordmark').addEventListener('pointerdown',()=>{ lp=setTimeout(()=>{ S.dbg=!S.dbg; $('debugPanel').classList.toggle('visible',S.dbg); if(S.dbg) renderDebug(); },700); });
+['pointerup','pointercancel','pointerleave'].forEach(ev=>document.querySelector('.wordmark').addEventListener(ev,()=>clearTimeout(lp)));
+
+// ── Service Worker ──
+function setupSW() {
+  if(!('serviceWorker' in navigator)) return;
+  if(location.hostname==='localhost'||location.hostname==='127.0.0.1') return;
+  window.addEventListener('load',async()=>{
+    try {
+      const reg=await navigator.serviceWorker.register('./sw.js');
+      S.sw=true;
+      const banner=(r)=>{ if(!r?.waiting) return; $('updateBanner').classList.add('visible'); $('reloadBtn').onclick=()=>r.waiting.postMessage({type:'SKIP_WAITING'}); };
+      if(reg.waiting) banner(reg);
+      reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw?.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller) banner(reg); }); });
+      navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
+    } catch(e){ S.sw=false; }
+  });
+}
+
+// ── Init ──
+loadSettings();
+setupSW();
+const _s=step(); S.remaining=_s.seconds; S.total=_s.seconds;
+applyTheme(); render();
+</script>
 </body>
 </html>
